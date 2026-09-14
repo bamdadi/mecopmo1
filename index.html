@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ردیاب صورت وضعیت مکو — ایستگاه شارژ اتوبوس برقی</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg-sidebar: oklch(15% 0.01 220);
+  --bg-main: oklch(97% 0.005 220);
+  --card: oklch(100% 0 0);
+  --border: oklch(90% 0.01 220);
+  --text: oklch(22% 0.02 220);
+  --muted: oklch(55% 0.02 220);
+  --accent: oklch(65% 0.13 200);
+  --accent-dark: oklch(45% 0.11 210);
+  --sidebar-text: oklch(92% 0.01 220);
+  font-size: 15px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn','Segoe UI',Tahoma,sans-serif}
+body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh}
+
+/* ===== Sidebar ===== */
+#sidebar{width:280px;min-width:280px;background:var(--bg-sidebar);color:var(--sidebar-text);display:flex;flex-direction:column;padding:18px 0;position:sticky;top:0;height:100vh}
+#sidebar h1{font-size:1.05rem;padding:0 18px 14px;line-height:1.7;border-bottom:1px solid oklch(30% 0.02 220)}
+#sidebar h1 small{display:block;font-size:.72rem;color:oklch(65% 0.03 220);font-weight:normal}
+.station-list{flex:1;overflow-y:auto;padding:10px}
+.station-list::-webkit-scrollbar{width:6px}
+.station-list::-webkit-scrollbar-thumb{background:oklch(35% 0.02 220);border-radius:3px}
+.station-item{display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:10px;cursor:pointer;transition:.15s;margin-bottom:4px;border:1px solid transparent}
+.station-item:hover{background:oklch(24% 0.02 220)}
+.station-item.active{background:oklch(30% 0.05 200);border-color:oklch(45% 0.09 200)}
+.station-item .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.station-item .name{flex:1;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.station-item .icons{display:none;gap:4px}
+.station-item:hover .icons{display:flex}
+.icon-btn{background:none;border:none;color:oklch(75% 0.02 220);cursor:pointer;font-size:.85rem;padding:2px 4px;border-radius:5px}
+.icon-btn:hover{background:oklch(40% 0.03 220);color:#fff}
+#addStationBtn{margin:10px 14px;padding:11px;border:none;border-radius:10px;background:var(--accent);color:oklch(15% 0.02 220);font-weight:700;font-size:.9rem;cursor:pointer;transition:.15s}
+#addStationBtn:hover{filter:brightness(1.1)}
+.sidebar-footer{padding:10px 14px;font-size:.7rem;color:oklch(55% 0.02 220);text-align:center}
+#appTitle,#appSub{cursor:pointer;border-bottom:1px dashed transparent}
+#appTitle:hover,#appSub:hover{border-bottom-color:oklch(65% 0.03 220)}
+#pageFooter{background:var(--card);border-top:1px solid var(--border);padding:12px 24px;text-align:center;font-size:.78rem;color:var(--muted);line-height:1.9}
+#pageFooter b{color:var(--accent-dark)}
+
+/* ===== Main ===== */
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+#topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+#topbar .station-title{display:flex;align-items:center;gap:10px}
+#topbar .station-title .icon{font-size:1.4rem}
+#stationNameH{font-size:1.25rem;font-weight:800;color:var(--accent-dark);cursor:pointer;border-bottom:2px dashed transparent}
+#stationNameH:hover{border-bottom-color:var(--accent)}
+.invoice-box{display:flex;align-items:center;gap:8px;background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:6px 12px}
+.invoice-box label{font-size:.8rem;color:var(--muted);font-weight:700}
+#invoiceSelect{border:none;background:none;font-size:1rem;font-weight:800;color:var(--accent-dark);cursor:pointer;outline:none;min-width:90px}
+.mini-btn{border:1px solid var(--border);background:var(--card);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:.85rem;color:var(--text);transition:.15s}
+.mini-btn:hover{border-color:var(--accent);color:var(--accent-dark)}
+.spacer{flex:1}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:10px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-print{background:var(--accent-dark);color:#fff}
+.btn-backup{background:oklch(70% 0.12 160);color:oklch(20% 0.05 160)}
+.btn-restore{background:oklch(80% 0.08 85);color:oklch(30% 0.06 85)}
+.btn-primary{background:var(--accent);color:oklch(15% 0.02 220)}
+.btn-danger{background:oklch(60% 0.18 25);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+
+#content{padding:20px 24px;flex:1}
+
+/* summary cards */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.sum-card .lbl{font-size:.75rem;color:var(--muted);font-weight:600}
+.sum-card .val{font-size:1.5rem;font-weight:800;color:var(--accent-dark)}
+.sum-card.green .val{color:oklch(50% 0.13 155)}
+.sum-card.amber .val{color:oklch(60% 0.13 75)}
+.sum-card.red .val{color:oklch(55% 0.17 25)}
+
+/* stages */
+.section-title{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
+.section-title h2{font-size:1.05rem;color:var(--text)}
+.section-title .line{flex:1;height:1px;background:var(--border)}
+.stages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-bottom:24px}
+.stage-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.15s}
+.stage-card:hover{box-shadow:0 6px 20px oklch(50% 0.03 220 / .15);transform:translateY(-2px)}
+.stage-card .strip{height:6px}
+.stage-card .body{padding:14px 16px}
+.stage-card h3{font-size:.98rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.stage-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;color:#fff;font-size:.75rem;font-weight:800;flex-shrink:0}
+.stage-meta{font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.stage-meta b{color:var(--text);font-weight:600}
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pbar{flex:1;height:10px;border-radius:6px;background:oklch(93% 0.01 220);overflow:hidden}
+.pfill{height:100%;border-radius:6px;transition:width .4s}
+.pct{font-size:.85rem;font-weight:800;min-width:44px;text-align:left}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+.st-done{background:oklch(93% 0.06 155);color:oklch(42% 0.12 155)}
+.st-doing{background:oklch(93% 0.06 230);color:oklch(45% 0.13 230)}
+.st-hold{background:oklch(94% 0.06 85);color:oklch(50% 0.12 75)}
+.st-none{background:oklch(93% 0.01 220);color:oklch(50% 0.02 220)}
+.stage-notes{font-size:.78rem;color:var(--muted);background:var(--bg-main);border-radius:8px;padding:8px 10px;margin-top:10px;white-space:pre-wrap}
+.card-actions{display:flex;gap:6px;border-top:1px solid var(--border);padding:8px 12px;background:oklch(98.5% 0.003 220)}
+.card-actions button{flex:1;border:none;background:none;padding:6px;font-size:.78rem;cursor:pointer;border-radius:7px;color:var(--muted);font-weight:600}
+.card-actions button:hover{background:var(--bg-main);color:var(--accent-dark)}
+.card-actions .del:hover{color:oklch(55% 0.17 25)}
+
+/* diagram */
+.diagram-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:26px}
+.diagram-wrap h2{font-size:1.05rem;margin-bottom:4px}
+.diagram-wrap .sub{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.chart-box{height:480px;min-height:450px;position:relative}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.legend .item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)}
+.legend .sw{width:14px;height:14px;border-radius:4px}
+
+/* modal */
+#modalBg{position:fixed;inset:0;background:oklch(15% 0.02 220 / .55);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(3px)}
+#modalBg.show{display:flex}
+#modal{background:var(--card);border-radius:18px;width:min(560px,94vw);max-height:90vh;overflow-y:auto;padding:24px}
+#modal h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent-dark)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+.fg label{display:block;font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.88rem;font-family:inherit;background:var(--bg-main);color:var(--text);outline:none;transition:.15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* print */
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:15mm 12mm}
+  body{display:block;background:#fff;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #sidebar,#topbar,#content,#modalBg,#pageFooter{display:none!important}
+  #printArea{display:block!important}
+  *{box-shadow:none!important;background-image:none!important}
+  #printArea h1{text-align:center;font-size:13pt;margin-bottom:4px}
+  #printArea .pr-sub{text-align:center;font-size:10pt;color:#555;margin-bottom:14px}
+  #printArea table{width:100%;border-collapse:collapse;font-size:10pt}
+  #printArea tr{page-break-inside:avoid}
+  #printArea th,#printArea td{border:0.5pt solid #999;padding:5px 7px;text-align:right}
+  #printArea th{background:#e6f2f4}
+  #printArea .signs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:46px;text-align:center;font-size:10pt}
+  #printArea .signs div{border-top:1px solid #333;padding-top:6px}
+  #printArea .pr-footer{margin-top:26px;text-align:center;font-size:9pt;color:#444;border-top:1px solid #999;padding-top:8px;line-height:1.8}
+}
+@media (max-width:820px){
+  body{flex-direction:column}
+  #sidebar{width:100%;height:auto;position:relative}
+  .form-grid{grid-template-columns:1fr}
+}
+
+/* ===== Gist Sync ===== */
+.btn-push{background:#2563eb;color:#fff;}
+.btn-push:hover{background:#1d4ed8;}
+.btn-pull{background:#16a34a;color:#fff;}
+.btn-pull:hover{background:#15803d;}
+.btn-sync-cfg{background:#6b7280;color:#fff;}
+.btn-sync-cfg:hover{background:#4b5563;}
+.hidden-legacy{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;align-items:center;justify-content:center;}
+
+#gistBox{background:#fff;border-radius:10px;padding:28px 32px;width:460px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.18);}
+#gistBox h3{margin:0 0 16px;font-size:1.05rem;color:#1e293b;}
+#gistBox label{display:block;font-size:.85rem;color:#475569;margin-bottom:4px;}
+#gistBox input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:.9rem;margin-bottom:14px;}
+#gistBox .modal-actions{display:flex;gap:8px;justify-content:flex-end;}
+#gistBox .modal-actions button{padding:7px 18px;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;}
+#gistBox .btn-save-cfg{background:#2563eb;color:#fff;}
+#gistBox .btn-cancel-cfg{background:#e2e8f0;color:#1e293b;}
+#syncStatus{font-size:.8rem;margin-left:4px;color:#64748b;}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <h1>⚡ <span id="appTitle" title="برای ویرایش کلیک کنید">ردیاب صورت وضعیت مکو</span><small id="appSub" title="برای ویرایش کلیک کنید">ایستگاه شارژ اتوبوس برقی</small></h1>
+  <div class="station-list" id="stationList"></div>
+  <button id="addStationBtn"><span id="addStationLabel">＋ افزودن ایستگاه</span></button><button id="editAddBtn" title="ویرایش متن دکمه" style="margin:0 14px 10px;padding:6px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-size:.85rem;color:oklch(55% 0.02 220)">✏️</button>
+  <div class="sidebar-footer">نسخه ۱.۴ — ذخیره‌سازی محلی مرورگر</div>
+</nav>
+
+<div id="main">
+  <header id="topbar">
+    <div class="station-title">
+      <span class="icon">🚏</span>
+      <h2 id="stationNameH" title="برای ویرایش کلیک کنید">—</h2>
+    </div>
+    <div class="invoice-box">
+      <label>شماره صورت وضعیت:</label>
+      <select id="invoiceSelect"></select>
+      <button class="mini-btn" id="addInvoiceBtn" title="افزودن شماره صورت وضعیت جدید">＋</button>
+      <button class="mini-btn" id="delInvoiceBtn" title="حذف صورت وضعیت فعلی">🗑</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="action-bar">
+      <button class="btn btn-push" onclick="gistPush()">☁️ Push</button>
+      <button class="btn btn-pull" onclick="gistPull()">⬇️ Pull</button>
+      <span id="syncStatus"></span>
+      <button class="btn btn-print" onclick="printReport()">🖨 چاپ / PDF</button>
+      <button class="btn btn-backup" onclick="backupJSON()">💾 پشتیبان JSON</button>
+      <button class="btn btn-restore" onclick="document.getElementById('restoreFile').click()">📂 بازیابی</button>
+      <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreJSON(this)">
+    </div>
+  </header>
+
+  <div id="content">
+    <div class="summary" id="summary"></div>
+
+    <div class="section-title">
+      <h2>مراحل صورت وضعیت</h2><div class="line"></div>
+      <button class="btn btn-primary" onclick="openStageModal()">＋ افزودن مرحله</button>
+    </div>
+    <div class="stages-grid" id="stagesGrid"></div>
+
+    <div class="diagram-wrap">
+      <h2>📊 دیاگرام شماتیک پیشرفت مراحل</h2>
+      <div class="sub">نمودار گانت — بازه زمانی، درصد پیشرفت و وضعیت هر مرحله</div>
+      <div class="chart-box"><canvas id="gantt"></canvas></div>
+    </div>
+  </div>
+  <footer id="pageFooter">
+    © <span id="fcYear"></span> MECO — All rights reserved. This application is exclusively owned by the <b>PMO Office of MECO Company</b>.<br>
+    Designed by <b>Bamdad Roozegar</b>.
+  </footer>
+</div>
+
+<div id="modalBg"><div id="modal"></div></div>
+
+</div>
+
+<div id="printArea"></div>
+
+<script>
+/* ===== constants ===== */
+const HEX=['#d4563f','#d79a3a','#c9b845','#5db56f','#3aabba','#3f7fd4','#7a5bd6','#c25bb8','#2e8ca8'];
+const OKLCH=['oklch(65% 0.14 55)','oklch(70% 0.13 95)','oklch(70% 0.13 95)','oklch(68% 0.13 145)','oklch(62% 0.13 185)','oklch(60% 0.14 230)','oklch(62% 0.15 285)','oklch(65% 0.15 330)','oklch(55% 0.12 205)'];
+const STATUSES={done:'انجام شده',doing:'در حال انجام',hold:'معلق',none:'انجام نشده'};
+const STATUS_CLASS={done:'st-done',doing:'st-doing',hold:'st-hold',none:'st-none'};
+const PROG_LINE_COLOR='#1e3a5f'; /* colored progress fill (not white) */
+const DEFAULT_STAGES=[
+ {name:'تهیه و تنظیم صورت وضعیت',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'بررسی اولیه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'تهیه صورت وضعیت نسخه مکو',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'ارسال صورت وضعیت برای مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'صدور فاکتور پیمانکار',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'واحد تأمین مکو',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'تهیه صورت حساب و ارسال به تأمین',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'ارسال روکش نامه به مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'پرینت سه نسخه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'تحویل روکش نامه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'تهیه فرم های 7 گانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'تحویل نسخه نهایی به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'پیگیری تا حصول نتیجه نهایی',resp:'',start:'',end:'',progress:0,status:'none',notes:''}
+];
+
+/* ===== state ===== */
+let DB=null, cur={st:null,inv:null}, ganttChart=null;
+function uid(){return Math.random().toString(36).slice(2,10);}
+function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function stageColor(i){return OKLCH[i%OKLCH.length];}
+function stageHex(i){return HEX[i%HEX.length];}
+
+function load(){
+  try{DB=JSON.parse(localStorage.getItem('mokho_db'))}catch(e){DB=null}
+  if(!DB||!DB.stations||!DB.stations.length) DB={stations:[
+    {id:uid(),name:'اکباتان',invoices:{}},
+    {id:uid(),name:'هنگام',invoices:{}},
+    {id:uid(),name:'بعثت',invoices:{}},
+    {id:uid(),name:'کیانشهر',invoices:{}},
+    {id:uid(),name:'فردیس',invoices:{}}
+  ]};
+  cur.st=DB.stations[0].id;
+  try{const t=JSON.parse(localStorage.getItem('mokho_titles'));if(t&&t.title)APP_TITLES=t;}catch(e){}
+  const nums=Object.keys(DB.stations[0].invoices);
+  cur.inv=nums.length?nums.sort((a,b)=>(+a)-(+b))[0]:null;
+}
+function save(){DB.lastModified=new Date().toISOString();localStorage.setItem('mokho_db',JSON.stringify(DB));localStorage.setItem('mokho_titles',JSON.stringify(APP_TITLES));}
+function curStation(){return DB.stations.find(s=>s.id===cur.st)||null;}
+function curInvoice(){const s=curStation();return s?(s.invoices[cur.inv]||null):null;}
+function ensureInvoice(s,num){if(!s.invoices[num])s.invoices[num]={stages:JSON.parse(JSON.stringify(DEFAULT_STAGES))};return s.invoices[num];}
+
+/* ===== jalali ===== */
+function jalaliFmt(str){
+  if(!str)return '—';
+  const m=String(str).match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+  return m?`${m[1]}/${m[2].padStart(2,'0')}/${m[3].padStart(2,'0')}`:str;
+}
+function jDay(str){ // approximate jalali day index for gantt positioning
+  const m=String(str||'').match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+  if(!m)return null;
+  return (+m[1]-1300)*366+(+m[2])*31+(+m[3]);
+}
+
+/* ===== editable app titles ===== */
+let APP_TITLES={title:'ردیاب صورت وضعیت مکو',sub:'ایستگاه شارژ اتوبوس برقی'};
+function renderTitles(){
+  document.getElementById('appTitle').textContent=APP_TITLES.title;
+  document.getElementById('appSub').textContent=APP_TITLES.sub;
+  document.title=APP_TITLES.title+' — '+APP_TITLES.sub;
+}
+function editAppTitle(which){
+  const def=which==='title'?APP_TITLES.title:APP_TITLES.sub;
+  const v=prompt(which==='title'?'عنوان اصلی برنامه:':'زیرعنوان برنامه (نام پروژه/صنعت):',def);
+  if(!v||!v.trim())return;
+  if(which==='title')APP_TITLES.title=v.trim();else APP_TITLES.sub=v.trim();
+  renderAll();
+}
+document.getElementById('appTitle').onclick=()=>editAppTitle('title');
+document.getElementById('appSub').onclick=()=>editAppTitle('sub');
+document.getElementById('fcYear').textContent=new Date().getFullYear();
+
+/* ===== render ===== */
+function renderAll(){renderSidebar();renderTopbar();renderSummary();renderStages();renderGantt();renderLegend();renderTitles();save();}
+
+function renderSidebar(){
+  const el=document.getElementById('stationList');el.innerHTML='';
+  DB.stations.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='station-item'+(s.id===cur.st?' active':'');
+    d.innerHTML=`<span class="dot"></span><span class="name">${esc(s.name)}</span>
+      <span class="icons">
+        <button class="icon-btn" title="ویرایش نام" onclick="event.stopPropagation();renameStation('${s.id}')">✏️</button>
+        <button class="icon-btn" title="حذف ایستگاه" onclick="event.stopPropagation();deleteStation('${s.id}')">🗑</button>
+      </span>`;
+    d.onclick=()=>{cur.st=s.id;const nums=Object.keys(s.invoices).sort((a,b)=>(+a)-(+b));cur.inv=nums.length?nums[nums.length-1]:null;renderAll();};
+    el.appendChild(d);
+  });
+}
+
+function renderTopbar(){
+  const s=curStation(), sel=document.getElementById('invoiceSelect'), h=document.getElementById('stationNameH');
+  if(!s){h.textContent='—';sel.innerHTML='';return;}
+  h.textContent='ایستگاه '+s.name;
+  const nums=Object.keys(s.invoices).sort((a,b)=>(+a)-(+b));
+  if(!cur.inv&&nums.length)cur.inv=nums[0];
+  sel.innerHTML=nums.map(n=>`<option value="${n}" ${n===cur.inv?'selected':''}>صورت وضعیت ${n}</option>`).join('')||'<option value="">—</option>';
+}
+
+function renderSummary(){
+  const inv=curInvoice(),el=document.getElementById('summary');
+  if(!inv){el.innerHTML='';return;}
+  const st=inv.stages;
+  const avg=st.length?Math.round(st.reduce((a,s)=>a+(+s.progress||0),0)/st.length):0;
+  const done=st.filter(s=>s.status==='done').length;
+  const doing=st.filter(s=>s.status==='doing').length;
+  const none=st.filter(s=>s.status==='none').length;
+  el.innerHTML=`
+   <div class="sum-card"><div class="lbl">تعداد مراحل</div><div class="val">${st.length}</div></div>
+   <div class="sum-card green"><div class="lbl">میانگین پیشرفت کل</div><div class="val">٪${avg}</div></div>
+   <div class="sum-card"><div class="lbl">انجام شده</div><div class="val">${done}</div></div>
+   <div class="sum-card amber"><div class="lbl">در حال انجام</div><div class="val">${doing}</div></div>
+   <div class="sum-card red"><div class="lbl">انجام نشده / معلق</div><div class="val">${none+st.filter(s=>s.status==='hold').length}</div></div>`;
+}
+
+function renderStages(){
+  const inv=curInvoice(),el=document.getElementById('stagesGrid');el.innerHTML='';
+  if(!inv){el.innerHTML='<p style="color:var(--muted)">برای این ایستگاه هنوز شماره صورت وضعیتی ثبت نشده است. از دکمه ＋ در نوار بالا اضافه کنید.</p>';return;}
+  inv.stages.forEach((st,i)=>{
+    const hx=st.color||stageHex(i); /* custom color if set, else default */
+    const card=document.createElement('div');card.className='stage-card';
+    card.style.background=hx+'1f'; /* subtle tinted background (12% opacity) */
+    card.innerHTML=`
+      <div class="strip" style="background:${hx}"></div>
+      <div class="body">
+        <h3><span class="stage-num" style="background:${hx}">${i+1}</span>${esc(st.name)}</h3>
+        <div class="stage-meta">
+          <span>👤 مسئول: <b>${esc(st.resp)||'—'}</b></span>
+          <span>📅 شروع: <b>${jalaliFmt(st.start)}</b> &nbsp;|&nbsp; پایان: <b>${jalaliFmt(st.end)}</b></span>
+        </div>
+        <div class="progress-row">
+          <div class="pbar"><div class="pfill" style="width:${st.progress}%;background:${hx}"></div></div>
+          <span class="pct">٪${st.progress}</span>
+        </div>
+        <span class="badge ${STATUS_CLASS[st.status]}">${STATUSES[st.status]}</span>
+        ${st.notes?`<div class="stage-notes">${esc(st.notes)}</div>`:''}
+      </div>
+      <div class="card-actions">
+        <button onclick="openStageModal(${i})">✏️ ویرایش</button>
+        <button onclick="moveStage(${i},-1)">⬆ بالا</button>
+        <button onclick="moveStage(${i},1)">⬇ پایین</button>
+        <button class="del" onclick="deleteStage(${i})">🗑 حذف</button>
+      </div>`;
+    el.appendChild(card);
+  });
+}
+
+/* ===== gantt ===== */
+function renderGantt(){
+  const inv=curInvoice(),cv=document.getElementById('gantt');
+  if(ganttChart){ganttChart.destroy();ganttChart=null;}
+  if(!inv)return;
+  const labels=[],data=[],bg=[],pct=[];
+  inv.stages.forEach((st,i)=>{
+    labels.push(`${i+1}. ${st.name}`);
+    const sv=jDay(st.start),ev=jDay(st.end);
+    let base=sv,len=30;
+    if(sv!=null&&ev!=null&&ev>sv)len=ev-sv;
+    else if(sv==null&&ev!=null){base=ev-30;len=30;}
+    else if(sv==null){base=1000+i*40;len=30;}
+    data.push([base,base+len]);
+    bg.push(st.color||stageHex(i)); /* custom color */
+    pct.push(+st.progress||0);
+  });
+  ganttChart=new Chart(cv,{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:bg,borderColor:'#fff',borderWidth:1.5,borderRadius:5,barPercentage:.38,categoryPercentage:.55}]},
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      layout:{padding:{right:110}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          rtl:true,bodyFont:{size:13,family:'inherit'},titleFont:{family:'inherit'},
+          callbacks:{label(ctx){
+            const st=inv.stages[ctx.dataIndex];
+            return ['مسئول: '+(st.resp||'—'),'شروع: '+jalaliFmt(st.start)+' — پایان: '+jalaliFmt(st.end),'پیشرفت: ٪'+st.progress,'وضعیت: '+STATUSES[st.status]];
+          }}
+        }
+      },
+      scales:{
+        x:{min:0,display:false,grid:{display:false},ticks:{display:false}},
+        y:{ticks:{font:{family:"Vazirmatn, 'Segoe UI', Tahoma, sans-serif",size:13,weight:'600'},color:'#1a3a4a'},grid:{display:false}}
+      }
+    },
+    plugins:[{
+      id:'prog',
+      afterDatasetsDraw(chart){
+        const ctx=chart.ctx,meta=chart.getDatasetMeta(0),x0=chart.scales.x.getPixelForValue(chart.scales.x.min);
+        inv.stages.forEach((st,i)=>{
+          const bar=meta.data[i];if(!bar)return;
+          const p=Math.max(0,Math.min(100,+st.progress||0));
+          const full=bar.x-x0, w=full*(p/100);
+          const pad=2, bh=bar.height-pad*2, bx=x0+pad, by=bar.y+pad, bw=full-pad*2;
+          ctx.save();
+          /* crisp track */
+          ctx.beginPath();ctx.roundRect(bx,by,bw,bh,bh/2);
+          ctx.fillStyle='rgba(30,58,95,.10)';ctx.fill();
+          ctx.lineWidth=1;ctx.strokeStyle='rgba(30,58,95,.18)';ctx.stroke();
+          if(w>pad*3){
+            /* gradient progress fill */
+            const g=ctx.createLinearGradient(bx,by,bx+w,by);
+            g.addColorStop(0,'#2f6ea8');g.addColorStop(1,'#1e3a5f');
+            ctx.beginPath();ctx.roundRect(bx,by,Math.max(w-pad,bh),bh,bh/2);ctx.fillStyle=g;ctx.fill();
+            /* subtle top highlight */
+            ctx.beginPath();ctx.roundRect(bx,by,Math.max(w-pad,bh),Math.max(bh/2,2),bh/2);
+            ctx.fillStyle='rgba(255,255,255,.22)';ctx.fill();
+          }
+          /* percentage text centered in the fill (or bar if fill too small) */
+          const label='٪'+p;
+          const inFill=w-pad>bh*2.6;
+          const cx=inFill? bx+(w-pad)/2 : bx+bw/2;
+          ctx.font='700 11px Vazirmatn, Tahoma, sans-serif';
+          ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillStyle=inFill?'#fff':'#1e3a5f';
+          ctx.fillText(label,cx,by+bh/2+0.5);
+          /* 100% green check badge at the end of the bar */
+          if(p>=100){
+            const r=Math.max(7,Math.min(11,bh/2));
+            const cx2=bar.x+r+4, cy2=bar.y+bar.height/2;
+            const gg=ctx.createRadialGradient(cx2,cy2,1,cx2,cy2,r+3);
+            gg.addColorStop(0,'rgba(76,200,120,.35)');gg.addColorStop(1,'rgba(76,200,120,0)');
+            ctx.fillStyle=gg;ctx.beginPath();ctx.arc(cx2,cy2,r+3,0,Math.PI*2);ctx.fill();
+            const bg2=ctx.createLinearGradient(cx2-r,cy2-r,cx2+r,cy2+r);
+            bg2.addColorStop(0,'#34c26e');bg2.addColorStop(1,'#1f9e56');
+            ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
+            ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,255,255,.85)';ctx.stroke();
+            ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';
+            ctx.beginPath();
+            ctx.moveTo(cx2-r*0.42,cy2+r*0.02);
+            ctx.lineTo(cx2-r*0.08,cy2+r*0.36);
+            ctx.lineTo(cx2+r*0.45,cy2-r*0.32);
+            ctx.stroke();
+          }
+          ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+function renderLegend(){ /* disabled in v1.4 — colored legend labels removed */ return; }
+
+/* ===== stage modal ===== */
+function openStageModal(idx){
+  const inv=curInvoice();if(!inv)return;
+  const st=idx!=null?inv.stages[idx]:{name:'',resp:'',start:'',end:'',progress:0,status:'none',notes:'',color:null};
+  const defColor=st.color||stageHex(idx!=null?idx:inv.stages.length);
+  document.getElementById('modal').innerHTML=`
+    <h2>${idx!=null?'ویرایش مرحله':'افزودن مرحله جدید'}</h2>
+    <div class="form-grid">
+      <div class="fg full"><label>نام مرحله</label><input id="f_name" value="${esc(st.name)}"></div>
+      <div class="fg full"><label>مسئول انجام</label><input id="f_resp" value="${esc(st.resp)}"></div>
+      <div class="fg"><label>تاریخ شروع (شمسی، مثال 1403/05/12)</label><input id="f_start" value="${esc(st.start)}" placeholder="1403/05/12"></div>
+      <div class="fg"><label>تاریخ پایان (شمسی، مثال 1403/06/25)</label><input id="f_end" value="${esc(st.end)}" placeholder="1403/06/25"></div>
+      <div class="fg"><label>درصد پیشرفت (۰ تا ۱۰۰)</label><input id="f_prog" type="number" min="0" max="100" value="${st.progress}"></div>
+      <div class="fg"><label>رنگ کارت</label><input id="f_color" type="color" value="${defColor}" style="height:40px;padding:3px;cursor:pointer"></div>
+      <div class="fg"><label>وضعیت</label><select id="f_status">
+        ${Object.entries(STATUSES).map(([k,v])=>`<option value="${k}" ${st.status===k?'selected':''}>${v}</option>`).join('')}
+      </select></div>
+      <div class="fg full"><label>توضیحات</label><textarea id="f_notes" rows="3">${esc(st.notes)}</textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">انصراف</button>
+      <button class="btn btn-primary" onclick="saveStage(${idx})">ذخیره</button>
+    </div>`;
+  document.getElementById('modalBg').classList.add('show');
+  document.getElementById('f_name').focus();
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('show');}
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal();});
+function saveStage(idx){
+  const inv=curInvoice();if(!inv)return;
+  const obj={
+    name:document.getElementById('f_name').value.trim()||'مرحله بدون نام',
+    resp:document.getElementById('f_resp').value.trim(),
+    start:document.getElementById('f_start').value.trim(),
+    end:document.getElementById('f_end').value.trim(),
+    progress:Math.min(100,Math.max(0,+document.getElementById('f_prog').value||0)),
+    status:document.getElementById('f_status').value,
+    color:document.getElementById('f_color').value||stageHex(idx!=null?idx:inv.stages.length),
+    notes:document.getElementById('f_notes').value.trim()
+  };
+  if(obj.progress===100&&obj.status==='none')obj.status='done';
+  if(obj.progress>0&&obj.progress<100&&obj.status==='none')obj.status='doing';
+  if(idx!=null)inv.stages[idx]=obj;else inv.stages.push(obj);
+  closeModal();renderAll();
+}
+function deleteStage(i){const inv=curInvoice();if(inv&&confirm('این مرحله حذف شود؟')){inv.stages.splice(i,1);renderAll();}}
+function moveStage(i,d){const inv=curInvoice();if(!inv)return;const j=i+d;if(j<0||j>=inv.stages.length)return;[inv.stages[i],inv.stages[j]]=[inv.stages[j],inv.stages[i]];renderAll();}
+
+/* ===== stations ===== */
+function askName(title,def){const v=prompt(title,def||'');return v&&v.trim()?v.trim():null;}
+function addStation(){
+  const name=askName('نام ایستگاه جدید:');if(!name)return;
+  const s={id:uid(),name,invoices:{}};
+  DB.stations.push(s);cur.st=s.id;cur.inv=null;
+  const n=askName('شماره صورت وضعیت اول برای «'+name+'»:','22');
+  if(n){ensureInvoice(s,n);cur.inv=n;}
+  renderAll();
+}
+function renameStation(id){
+  const s=DB.stations.find(x=>x.id===id);if(!s)return;
+  const name=askName('نام جدید ایستگاه:',s.name);if(!name)return;
+  s.name=name;renderAll();
+}
+function deleteStation(id){
+  const s=DB.stations.find(x=>x.id===id);if(!s)return;
+  if(!confirm('ایستگاه «'+s.name+'» و همه صورت وضعیت‌هایش حذف شود؟'))return;
+  DB.stations=DB.stations.filter(x=>x.id!==id);
+  if(cur.st===id){cur.st=DB.stations[0]?DB.stations[0].id:null;cur.inv=null;}
+  renderAll();
+}
+/* ===== editable add-station button label ===== */
+const ADD_BTN_KEY='mokho_add_btn_label';
+let ADD_BTN_LABEL=localStorage.getItem(ADD_BTN_KEY)||'افزودن ایستگاه';
+function renderAddBtnLabel(){
+  document.getElementById('addStationLabel').textContent='＋ '+ADD_BTN_LABEL;
+}
+renderAddBtnLabel();
+document.getElementById('editAddBtn').onclick=()=>{
+  const v=prompt('متن دکمه افزودن ایستگاه:',ADD_BTN_LABEL);
+  if(!v||!v.trim())return;
+  ADD_BTN_LABEL=v.trim();
+  localStorage.setItem(ADD_BTN_KEY,ADD_BTN_LABEL);
+  renderAddBtnLabel();
+};
+document.getElementById('addStationLabel').ondblclick=event=>{
+  event.stopPropagation();
+  document.getElementById('editAddBtn').onclick();
+};
+document.getElementById('addStationBtn').onclick=addStation;
+document.getElementById('stationNameH').onclick=()=>{if(cur.st)renameStation(cur.st);};
+
+/* ===== invoices ===== */
+document.getElementById('addInvoiceBtn').onclick=()=>{
+  const s=curStation();if(!s)return alert('ابتدا یک ایستگاه انتخاب کنید');
+  const n=askName('شماره صورت وضعیت جدید (مثلاً 26):');if(!n)return;
+  ensureInvoice(s,n);cur.inv=n;renderAll();
+};
+document.getElementById('invoiceSelect').onchange=e=>{cur.inv=e.target.value;renderAll();};
+document.getElementById('delInvoiceBtn').onclick=()=>{
+  const s=curStation(),inv=curInvoice();if(!s||!inv)return;
+  if(!confirm('صورت وضعیت شماره '+cur.inv+' و همه مراحلش حذف شود؟'))return;
+  delete s.invoices[cur.inv];const nums=Object.keys(s.invoices).sort((a,b)=>(+a)-(+b));
+  if(nums.length)cur.inv=nums[0];else cur.inv=null;
+  renderAll();
+};
+
+/* ===== backup / restore ===== */
+function backupJSON(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='mokho_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+}
+function restoreJSON(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d.stations||!Array.isArray(d.stations))throw 0;
+      if(!confirm('بازیابی پشتیبان، داده‌های فعلی را جایگزین می‌کند. ادامه؟'))return;
+      DB=d;cur.st=DB.stations[0]?DB.stations[0].id:null;cur.inv=null;
+      renderAll();alert('بازیابی با موفقیت انجام شد ✅');
+    }catch(e){alert('فایل پشتیبان معتبر نیست ❌');}
+    input.value='';
+  };
+  r.readAsText(f);
+}
+
+/* ===== print ===== */
+function printReport(){
+  const s=curStation(),inv=curInvoice();
+  if(!s||!inv)return alert('ابتدا ایستگاه و شماره صورت وضعیت را انتخاب کنید');
+  const pa=document.getElementById('printArea');
+  const avg=inv.stages.length?Math.round(inv.stages.reduce((a,x)=>a+(+x.progress||0),0)/inv.stages.length):0;
+  pa.innerHTML=`
+    <h1>صورت وضعیت پیشرفت کار — مکو (ایستگاه شارژ اتوبوس برقی)</h1>
+    <div class="pr-sub">ایستگاه: <b>${esc(s.name)}</b> &nbsp;|&nbsp; شماره صورت وضعیت: <b>${esc(cur.inv)}</b> &nbsp;|&nbsp; میانگین پیشرفت: <b>٪${avg}</b></div>
+    <table>
+      <thead><tr><th>#</th><th>نام مرحله</th><th>مسئول</th><th>تاریخ شروع</th><th>تاریخ پایان</th><th>درصد پیشرفت</th><th>وضعیت</th><th>توضیحات</th></tr></thead>
+      <tbody>
+        ${inv.stages.map((st,i)=>`<tr>
+          <td>${i+1}</td><td>${esc(st.name)}</td><td>${esc(st.resp)||'—'}</td>
+          <td>${jalaliFmt(st.start)}</td><td>${jalaliFmt(st.end)}</td>
+          <td>٪${st.progress}</td><td>${STATUSES[st.status]}</td><td>${esc(st.notes)||'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="signs"><div>مهندس ناظر مقیم</div><div>مهندس ناظر عالی</div><div>کارفرما</div><div>پیمانکار</div></div>
+    <div class="pr-footer">© ${new Date().getFullYear()} MECO — All rights reserved. This application is exclusively owned by the <b>PMO Office of MECO Company</b>.<br>Designed by <b>Bamdad Roozegar</b>.</div>`;
+  pa.style.display='block';
+  setTimeout(()=>{window.print();pa.style.display='none';},600);
+}
+
+/* ===== Worker API Sync (ver.08) ===== */
+const WORKER_URL = "https://meco-tracker-api.bamdad-roozegar.workers.dev";
+
+// دریافت هدر احراز هویت از Session فعال
+function getAuthHeader() {
+  const session = JSON.parse(sessionStorage.getItem("meco_auth_session_v1") || "null");
+  if (!session || !session.u || !session.p) return null;
+  return "Basic " + btoa(unescape(encodeURIComponent(session.u + ":" + session.p)));
+}
+
+// عملیات Pull
+function setSyncStatus(msg) {
+  const el = document.getElementById("syncStatus");
+  if (el) el.textContent = msg;
+  console.log("[sync]", msg);
+}
+
+async function hashPw(password) {
+  const msgBuffer = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function gistPull() {
+  const auth = getAuthHeader();
+  if (!auth) {
+    alert("لطفاً ابتدا وارد حساب کاربری خود شوید.");
+    return;
+  }
+
+  setSyncStatus("در حال دریافت داده‌ها از سرور...");
+  try {
+    const res = await fetch(`${WORKER_URL}/pull`, {
+      method: "GET",
+      headers: { "Authorization": auth }
+    });
+
+    if (res.status === 401) throw new Error("دسترسی غیرمجاز. مجدداً لاگین کنید.");
+    if (!res.ok) throw new Error(`خطای سرور: ${res.status}`);
+
+    const remoteData = await res.json();
+    if (remoteData && remoteData.db) {
+      DB = remoteData.db;
+      localStorage.setItem("mokho_db", JSON.stringify(DB));
+      renderAll();
+      // build pull counter metadata
+      let _pullCount = parseInt(localStorage.getItem("meco_pull_count") || "0", 10) + 1;
+      const _now = new Date();
+      const _pullDate = _now.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" })
+        + " ساعت " + String(_now.getHours()).padStart(2,"0") + ":" + String(_now.getMinutes()).padStart(2,"0");
+      localStorage.setItem("meco_pull_count", String(_pullCount));
+      localStorage.setItem("meco_pull_last", _pullDate);
+      setSyncStatus("✅ Pull موفق — نسخه " + _pullCount + " از وب دریافت شد — " + _pullDate);
+    }
+  } catch (err) {
+    setSyncStatus("❌ خطا در Pull: " + err.message);
+    alert("خطا در همگام‌سازی: " + err.message);
+  }
+}
+
+// عملیات Push (مخصوص مدیر)
+async function gistPush() {
+  const session = JSON.parse(sessionStorage.getItem("meco_auth_session_v1") || "null");
+  if (!session || session.role !== "admin") {
+    alert("⛔ عملیات Push فقط برای نقش مدیر (Admin) مجاز است.");
+    return;
+  }
+
+  const auth = getAuthHeader();
+  setSyncStatus("در حال ارسال داده‌ها به سرور...");
+  try {
+    const payload = JSON.stringify({
+      db: DB,
+      lastModified: new Date().toISOString(),
+      updatedBy: session.u
+    });
+
+    const res = await fetch(`${WORKER_URL}/push`, {
+      method: "POST",
+      headers: {
+        "Authorization": auth,
+        "Content-Type": "application/json"
+      },
+      body: payload
+    });
+
+    if (res.status === 401 || res.status === 403) throw new Error("عدم دسترسی به عملیات Push");
+    if (!res.ok) throw new Error(`خطای سرور: ${res.status}`);
+
+    setSyncStatus("✅ تغییرات با موفقیت در فضای ابری ذخیره شد.");
+  } catch (err) {
+    setSyncStatus("❌ خطا در Push: " + err.message);
+    alert("خطا در ذخیره‌سازی: " + err.message);
+  }
+}
+
+/* ===== init (MECOTRACKER AUTH: اجرای یک‌باره پس از احراز هویت) ===== */
+window.__mecoInit=function(){load();renderAll();};
+</script>
+
+<!-- MECOTRACKER AUTH START -->
+<style>
+/* MECOTRACKER AUTH START */
+#mtAuthOverlay{position:fixed;inset:0;background:oklch(15% 0.01 220 / .85);display:none;align-items:center;justify-content:center;z-index:99999}
+#mtAuthOverlay.show{display:flex}
+#mtAuthBox{background:var(--card);border-radius:16px;padding:28px;width:min(380px,92vw);box-shadow:0 20px 60px oklch(0% 0 0/.4);font-family:'Vazirmatn','Segoe UI',Tahoma,sans-serif}
+#mtAuthBox h2{font-size:1.05rem;margin-bottom:4px;color:var(--text)}
+#mtAuthBox p.hint{font-size:.75rem;color:var(--muted);margin-bottom:14px;line-height:1.8}
+#mtAuthBox label{display:block;font-size:.8rem;margin:10px 0 4px;color:var(--text)}
+#mtAuthBox input,#mtAuthBox select{width:100%;padding:10px;border:1px solid var(--border);border-radius:9px;font-size:.9rem;font-family:inherit;background:#fff;color:var(--text)}
+#mtAuthBox .mtbtn{width:100%;margin-top:14px;padding:11px;border:none;border-radius:10px;background:var(--accent);color:oklch(15% 0.02 220);font-weight:700;cursor:pointer;font-family:inherit;font-size:.9rem}
+#mtAuthBox .mtbtn:hover{filter:brightness(1.08)}
+#mtAuthMsg{font-size:.8rem;margin-top:10px;min-height:1.2em;text-align:center}
+#mtAuthMsg.err{color:#dc2626}#mtAuthMsg.ok{color:#16a34a}
+#mtUserBar{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+#mtUserBar b{color:var(--accent-dark)}
+#mtUserBar button{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-family:inherit;font-size:.78rem;color:var(--text)}
+#mtUserBar button:hover{background:var(--bg-main)}
+body.mt-viewer #addStationBtn,body.mt-viewer #editAddBtn,body.mt-viewer #addInvoiceBtn,
+body.mt-viewer #delInvoiceBtn,body.mt-viewer .btn-push,
+body.mt-viewer .btn-sync-cfg,body.mt-viewer .icon-btn{display:none!important}
+/* v2: Pull مجاز برای viewer — فقط Push و تنظیمات Gist مخفی می‌مانند */
+body.mt-viewer .btn-pull{display:inline-flex!important}
+#mtUsersModal{position:fixed;inset:0;background:oklch(15% 0.01 220/.6);display:none;align-items:center;justify-content:center;z-index:99998}
+#mtUsersModal.show{display:flex}
+#mtUsersBox{background:var(--card);border-radius:16px;padding:24px;width:min(520px,94vw);max-height:88vh;overflow-y:auto;font-family:inherit}
+#mtUsersBox h3{margin-bottom:12px}
+#mtUsersBox fieldset{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px}
+#mtUsersBox legend{font-size:.8rem;padding:0 6px;color:var(--muted)}
+#mtUsersBox label{font-size:.78rem;display:block;margin:6px 0 3px}
+#mtUsersBox input,#mtUsersBox select{width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.85rem}
+#mtUsersBox .row{display:flex;gap:8px}
+#mtUsersBox table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:6px}
+#mtUsersBox td,#mtUsersBox th{border:1px solid var(--border);padding:6px 8px;text-align:right}
+#mtUsersBox .mtbtn2{padding:8px 14px;border:none;border-radius:8px;background:var(--accent);color:oklch(15% 0.02 220);font-weight:700;cursor:pointer;font-family:inherit;font-size:.82rem;margin-top:8px}
+#mtUsersBox .mtdel{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;border-radius:6px;padding:3px 8px;cursor:pointer;font-family:inherit;font-size:.75rem}
+#mtUsersBox .mtpw{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;border-radius:6px;padding:3px 8px;cursor:pointer;font-family:inherit;font-size:.75rem;margin-inline-start:4px}
+/* MECOTRACKER AUTH END */
+</style>
+<div id="mtAuthOverlay" role="dialog" aria-modal="true">
+  <div id="mtAuthBox">
+    <h2>🔐 ورود به ردیاب صورت وضعیت مکو</h2>
+    <p class="hint">برای استفاده از گزارش ابتدا وارد شوید.<br>
+    حساب پیش‌فرض مدیر: نام کاربری <b>admin</b> — رمز عبور آن توسط مدیر سیستم ارائه می‌شود.<br>
+    <small>⚠️ این احراز هویت صرفاً client-side است و جایگزین امنیت سروری نیست.</small></p>
+    <label>نام کاربری</label><input id="mtUser" autocomplete="username">
+    <label>رمز عبور</label><input id="mtPass" type="password" autocomplete="current-password" value="">
+    <button class="mtbtn" id="mtLoginBtn">ورود</button>
+    <div id="mtAuthMsg"></div>
+  </div>
+</div>
+<div id="mtUsersModal">
+  <div id="mtUsersBox">
+    <h3>👤 مدیریت کاربران</h3>
+    <div id="mtUsersMsg" style="font-size:.8rem;min-height:1.2em;margin-bottom:6px"></div>
+    <fieldset><legend>تغییر رمز من (کاربر جاری)</legend>
+      <div class="row"><input id="mtNewPw1" type="password" placeholder="رمز جدید"><input id="mtNewPw2" type="password" placeholder="تکرار رمز جدید"></div>
+      <button class="mtbtn2" id="mtChangePwBtn">تغییر رمز</button>
+    </fieldset>
+    <fieldset><legend>ایجاد کاربر جدید</legend>
+      <label>نام کاربری</label><input id="mtNewUser">
+      <label>رمز عبور</label><input id="mtNewUserPw" type="password">
+      <label>نقش</label><select id="mtNewUserRole"><option value="viewer">viewer (فقط مشاهده)</option><option value="admin">admin (مدیر)</option></select>
+      <button class="mtbtn2" id="mtCreateUserBtn">ایجاد کاربر</button>
+    </fieldset>
+    <fieldset><legend>فهرست کاربران</legend><div id="mtUserList"></div></fieldset>
+    <button class="mtbtn2" id="mtCloseUsers" style="background:var(--bg-sidebar);color:#fff">بستن</button>
+  </div>
+</div>
+<script>
+/* MECOTRACKER AUTH START */
+(function(){
+'use strict';
+var WORKER_URL=window.WORKER_URL||'https://meco-tracker-api.bamdad-roozegar.workers.dev';
+var AUTH_USERS_KEY='meco_auth_users_v1';
+var AUTH_SESSION_KEY='meco_auth_session_v1';
+function mtMsg(id,t,ok){var el=document.getElementById(id);el.textContent=t;el.className=ok?'ok':'err';}
+/* --- hash: SHA-256 (وروکر ver.08) --- */
+function loadUsers(){
+  try{
+    var raw=localStorage.getItem(AUTH_USERS_KEY);
+    var u=raw?JSON.parse(raw):null;
+    if(!u||!Array.isArray(u)||!u.length)throw 0;
+    for(var i=0;i<u.length;i++)if(!u[i]||!u[i].u||!u[i].p||!(u[i].role==='admin'||u[i].role==='viewer'))throw 0;
+    return u;
+  }catch(e){ /* حالت امن: بازنشانی به حساب پیش‌فرض مدیر */
+    return [{u:'admin',p:'__SEED__',role:'admin'}];
+  }
+}
+function saveUsers(u){try{localStorage.setItem(AUTH_USERS_KEY,JSON.stringify(u));}catch(e){}}
+function getSession(){try{return JSON.parse(sessionStorage.getItem(AUTH_SESSION_KEY));}catch(e){return null;}}
+function setSession(s){if(s)sessionStorage.setItem(AUTH_SESSION_KEY,JSON.stringify(s));else sessionStorage.removeItem(AUTH_SESSION_KEY);}
+/* ver.08: session شامل u/p برای Basic Auth درخواست‌های Worker است */
+var users=loadUsers();
+/* seed حساب پیش‌فرض admin — رمز واقعی در این فایل به‌صورت متنی نمایش داده نمی‌شود */
+var MT_DEFAULT_ADMIN_PW=(function(){var p=['qaz','WSX','2026'];return function(){return p.join('');};})();
+function ensureSeed(){
+  var a=users.find(function(x){return x.u==='admin';});
+  if(a&&a.p==='__SEED__'){
+    return hashPw(MT_DEFAULT_ADMIN_PW()).then(function(h){a.p=h;saveUsers(users);});
+  }
+  if(!a){return hashPw(MT_DEFAULT_ADMIN_PW()).then(function(h){users.push({u:'admin',p:h,role:'admin'});saveUsers(users);});}
+  return Promise.resolve();
+}
+/* --- گارد نقش viewer --- */
+var MUTATORS=['addStation','renameStation','deleteStation','saveStage','deleteStage','moveStage','restoreJSON','gistPush'];
+/* v2: gistPull برای viewer مجاز شد (فقط خواندن)؛ save خواندن/رندر عادی است و از مسدودسازی خارج شد */
+window.__mtViewerCanPull=true;
+function isViewer(){var s=getSession();return !!s&&s.role==='viewer';}
+MUTATORS.forEach(function(fn){
+  if(typeof window[fn]==='function'){
+    var orig=window[fn];
+    window[fn]=function(){
+      if(isViewer()){alert('⛔ این عملیات برای نقش viewer مجاز نیست. برای تغییر داده‌ها با مدیر سیستم تماس بگیرید.');return;}
+      return orig.apply(this,arguments);
+    };
+  }
+});
+/* گارد سراسری رویدادهای تغییردهنده (event delegation در فاز capture) */
+var BLOCK_CLICK_IDS={'appTitle':1,'appSub':1,'stationNameH':1,'addStationBtn':1,'editAddBtn':1,'addInvoiceBtn':1,'delInvoiceBtn':1,'addStationLabel':1,'restoreFile':1};
+/* v2: انتخاب صرف (ایستگاه/صورت‌وضعیت/مرحله) مجاز و بدون alert است؛ فقط عناصر تغییردهنده مسدود می‌شوند */
+var SELECT_OK_SEL='#invoiceSelect,.stages-grid .stage-card,.stages-grid [onclick*="openStageModal" i] .stage,.stages-grid > *,.chart-box,#summary,.stages-grid';
+document.addEventListener('click',function(e){
+  if(!isViewer())return;
+  var t=e.target;
+  if(t.closest&&(t.closest('#mtUsersModal')||t.closest('#mtAuthOverlay')))return;
+  /* استثنای انتخاب: کلیک روی سلکت صورت‌وضعیت، کارت مرحله (بدون دکمه ویرایش/حذف) و لیست‌ها */
+  if(t.closest&&(t.closest('#invoiceSelect')||t.closest('.stage-card')||t.closest('#stagesGrid')))return;
+  if(t.closest&&t.closest('.btn-pull'))return; /* Pull برای viewer آزاد است */
+  var id=t.id&&BLOCK_CLICK_IDS[t.id];
+  if(!id&&t.closest){var anc=t.closest('[id]');if(anc&&BLOCK_CLICK_IDS[anc.id])id=anc.id;}
+  if(!id&&t.closest&&t.closest('.icon-btn,.btn-push,.btn-sync-cfg'))id='ctrl';
+  if(id){e.preventDefault();e.stopPropagation();alert('⛔ این عملیات تغییردهنده برای نقش viewer مجاز نیست.');}
+},true);
+document.addEventListener('dblclick',function(e){
+  if(!isViewer())return;
+  var t=e.target;
+  if(t.id&&BLOCK_CLICK_IDS[t.id]){e.preventDefault();e.stopPropagation();}
+},true);
+document.addEventListener('submit',function(e){
+  if(isViewer()&&!e.target.closest('#mtAuthOverlay')){e.preventDefault();alert('⛔ ارسال فرم برای نقش viewer مجاز نیست.');}
+},true);
+/* --- UI --- */
+function addUserBar(){
+  var bar=document.getElementById('mtUserBar');if(bar)return;
+  bar=document.createElement('div');bar.id='mtUserBar';
+  var host=document.querySelector('#topbar .action-bar')||document.getElementById('topbar');
+  host.appendChild(bar);
+}
+function renderUserBar(){
+  var s=getSession();addUserBar();
+  var bar=document.getElementById('mtUserBar');
+  if(!s){bar.innerHTML='';return;}
+  var roleFa=s.role==='admin'?'مدیر':'نمایش‌دهنده';
+  var html='<span>کاربر: <b>'+s.u+'</b> | نقش: <b>'+(s.role==='admin'?'admin':'viewer')+'</b> ('+roleFa+')</span>';
+  if(s.role==='admin')html+='<button id="mtOpenUsers" title="مدیریت کاربران">👤 مدیریت کاربران</button>';
+  html+='<button id="mtLogoutBtn">🚪 خروج</button>';
+  bar.innerHTML=html;
+  var ou=document.getElementById('mtOpenUsers');
+  if(ou)ou.onclick=function(){openUsers();};
+  document.getElementById('mtLogoutBtn').onclick=function(){
+    setSession(null);
+    document.body.classList.remove('mt-viewer');
+    renderUserBar();
+    document.getElementById('mtAuthOverlay').classList.add('show');
+    document.getElementById('mtAuthMsg').textContent='';
+    document.getElementById('mtUser').value='';document.getElementById('mtPass').value='';
+  };
+}
+function renderUserList(){
+  var box=document.getElementById('mtUserList');
+  var s=getSession();
+  box.innerHTML='<table><tr><th>نام کاربری</th><th>نقش</th><th>عملیات</th></tr>'+
+    users.map(function(u,i){
+      var admins=users.filter(function(x){return x.role==='admin';}).length;
+      var canDel=!(u.role==='admin'&&admins<=1);
+      return '<tr><td>'+u.u+'</td><td>'+u.role+'</td><td>'+
+        (canDel?'<button class="mtdel" data-i="'+i+'">حذف</button>':'<span style="font-size:.7rem;color:var(--muted)">آخرین مدیر</span>')+
+        '<button class="mtpw" data-i="'+i+'">تغییر رمز</button></td></tr>';
+    }).join('')+'</table>';
+  Array.prototype.forEach.call(box.querySelectorAll('.mtdel'),function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-i'),u=users[i];
+      if(!confirm('کاربر «'+u.u+'» حذف شود؟'))return;
+      var admins=users.filter(function(x){return x.role==='admin';});
+      if(u.role==='admin'&&admins.length<=1){mtMsg('mtUsersMsg','⛔ امکان حذف آخرین مدیر وجود ندارد.',false);return;}
+      users.splice(i,1);saveUsers(users);mtMsg('mtUsersMsg','✅ کاربر حذف شد.',true);renderUserList();
+    };
+  });
+  Array.prototype.forEach.call(box.querySelectorAll('.mtpw'),function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-i'),u=users[i];
+      var np=prompt('رمز جدید برای «'+u.u+'»:');if(np===null)return;
+      if(!np.trim()){mtMsg('mtUsersMsg','⛔ رمز خالی مجاز نیست.',false);return;}
+      hashPw(np.trim()).then(function(h){u.p=h;saveUsers(users);mtMsg('mtUsersMsg','✅ رمز کاربر «'+u.u+'» تغییر کرد.',true);});
+    };
+  });
+}
+function openUsers(){document.getElementById('mtUsersModal').classList.add('show');renderUserList();mtMsg('mtUsersMsg','',true);}
+async function doLogin(){
+  var u=document.getElementById('mtUser').value.trim();
+  var p=document.getElementById('mtPass').value;
+  if(!u||!p){mtMsg('mtAuthMsg','نام کاربری و رمز عبور را وارد کنید.',false);return;}
+  var btn=document.getElementById('mtLoginBtn');
+  if(btn)btn.disabled=true;
+  mtMsg('mtAuthMsg','⏳ در حال بررسی...',false);
+  try{
+    const res=await fetch(WORKER_URL+'/auth_check',{
+      method:'POST',
+      headers:{'Authorization':'Basic '+btoa(unescape(encodeURIComponent(u+':'+p))),'Content-Type':'application/json'}
+    });
+    if(res.status===200){
+      var j=null;
+      try{j=await res.json();}catch(e){}
+      var role=(j&&j.role)?j.role:'viewer';
+      setSession({u:u,p:p,role:role,ts:Date.now()});
+      document.getElementById('mtAuthOverlay').classList.remove('show');
+      document.body.classList.toggle('mt-viewer',role==='viewer');
+      renderUserBar();
+      mtMsg('mtAuthMsg','✅ خوش آمدید '+u,false);
+      if(typeof window.__mecoInit==='function'&&!window.__mecoInitDone){window.__mecoInitDone=true;try{window.__mecoInit();}catch(e){console.error('mecoInit',e);}}
+    }else if(res.status===401||res.status===403){
+      mtMsg('mtAuthMsg','❌ نام کاربری یا رمز عبور اشتباه است.',false);
+    }else{
+      mtMsg('mtAuthMsg','❌ پاسخ نامعتبر از سرور Worker (HTTP '+res.status+').',false);
+    }
+  }catch(e){
+    mtMsg('mtAuthMsg','❌ خطا در اتصال به سرور Worker. لطفاً اینترنت و وضعیت سرور را بررسی کنید.',false);
+    console.error('doLogin',e);
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
+document.getElementById('mtLoginBtn').onclick=doLogin;
+document.getElementById('mtPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+document.getElementById('mtCloseUsers').onclick=function(){document.getElementById('mtUsersModal').classList.remove('show');};
+document.getElementById('mtChangePwBtn').onclick=function(){
+  var s=getSession();if(!s)return;
+  var a=document.getElementById('mtNewPw1').value,b=document.getElementById('mtNewPw2').value;
+  if(!a.trim()){mtMsg('mtUsersMsg','⛔ رمز خالی مجاز نیست.',false);return;}
+  if(a!==b){mtMsg('mtUsersMsg','⛔ تکرار رمز مطابقت ندارد.',false);return;}
+  var me=users.find(function(x){return x.u===s.u;});
+  if(!me){mtMsg('mtUsersMsg','⛔ کاربر یافت نشد.',false);return;}
+  hashPw(a.trim()).then(function(h){me.p=h;saveUsers(users);document.getElementById('mtNewPw1').value='';document.getElementById('mtNewPw2').value='';mtMsg('mtUsersMsg','✅ رمز عبور با موفقیت تغییر کرد.',true);});
+};
+document.getElementById('mtCreateUserBtn').onclick=function(){
+  var u=document.getElementById('mtNewUser').value.trim();
+  var p=document.getElementById('mtNewUserPw').value;
+  var r=document.getElementById('mtNewUserRole').value;
+  if(!u){mtMsg('mtUsersMsg','⛔ نام کاربری را وارد کنید.',false);return;}
+  if(users.some(function(x){return x.u===u;})){mtMsg('mtUsersMsg','⛔ این نام کاربری تکراری است.',false);return;}
+  if(!p.trim()){mtMsg('mtUsersMsg','⛔ رمز عبور خالی مجاز نیست.',false);return;}
+  if(r!=='admin'&&r!=='viewer'){mtMsg('mtUsersMsg','⛔ نقش نامعتبر است.',false);return;}
+  hashPw(p.trim()).then(function(h){
+    users.push({u:u,p:h,role:r});saveUsers(users);
+    document.getElementById('mtNewUser').value='';document.getElementById('mtNewUserPw').value='';
+    mtMsg('mtUsersMsg','✅ کاربر «'+u+'» با نقش '+r+' ایجاد شد.',true);renderUserList();
+  });
+};
+/* --- شروع --- */
+ensureSeed().then(function(){
+  var s=getSession();
+  if(s&&users.some(function(x){return x.u===s.u;})){
+    document.body.classList.toggle('mt-viewer',s.role==='viewer');
+    renderUserBar();
+    if(typeof window.__mecoInit==='function'&&!window.__mecoInitDone){window.__mecoInitDone=true;try{window.__mecoInit();}catch(e){console.error('mecoInit',e);}}
+  }else{
+    setSession(null);
+    document.getElementById('mtAuthOverlay').classList.add('show');
+  }
+});
+/* MECOTRACKER AUTH END */
+})();
+</script>
+<!-- MECOTRACKER AUTH END -->
+
+</body>
+</html>
