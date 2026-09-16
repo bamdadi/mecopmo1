@@ -81,7 +81,6 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 
 #content{padding:20px 24px;flex:1}
 
-/* ===== داشبورد ===== */
 .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
 .sum-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
 .sum-card::before{content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--accent),var(--accent-dark))}
@@ -118,7 +117,6 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 .card-actions button:hover{background:var(--bg-main);color:var(--accent-dark)}
 .card-actions .del:hover{color:oklch(55% 0.17 25)}
 
-/* ===== داشبورد نمودارها ===== */
 .dashboard-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:26px;box-shadow:0 8px 28px oklch(50% 0.03 220 / .07)}
 .dashboard-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .dashboard-head .icon{font-size:1.2rem}
@@ -150,11 +148,8 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 .donut-legend .sw{width:10px;height:10px;border-radius:3px}
 .gg-empty{padding:40px;text-align:center;color:var(--muted);font-size:.85rem}
 
-@media (max-width:960px){
-  .dashboard-grid{grid-template-columns:1fr}
-}
+@media (max-width:960px){.dashboard-grid{grid-template-columns:1fr}}
 
-/* modal */
 #modalBg{position:fixed;inset:0;background:oklch(15% 0.02 220 / .55);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(3px)}
 #modalBg.show{display:flex}
 #modal{background:var(--card);border-radius:18px;width:min(560px,94vw);max-height:90vh;overflow-y:auto;padding:24px}
@@ -166,7 +161,6 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 
-/* ===== print ===== */
 #printArea{display:none}
 @media print{
   @page{size:A4;margin:15mm 12mm}
@@ -356,7 +350,7 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   <h1>⚡ <span id="appTitle" title="برای ویرایش کلیک کنید">ردیاب صورت وضعیت مکو</span><small id="appSub" title="برای ویرایش کلیک کنید">ایستگاه شارژ اتوبوس برقی</small></h1>
   <div class="station-list" id="stationList"></div>
   <button id="addStationBtn"><span id="addStationLabel">＋ افزودن ایستگاه</span></button><button id="editAddBtn" title="ویرایش متن دکمه" style="margin:0 14px 10px;padding:6px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-size:.85rem;color:oklch(55% 0.02 220)">✏️</button>
-  <div class="sidebar-footer">نسخه ۱.۴ — ذخیره‌سازی محلی مرورگر</div>
+  <div class="sidebar-footer">نسخه ۱.۶ — ذخیره‌سازی محلی مرورگر</div>
 </nav>
 
 <div id="main">
@@ -603,9 +597,11 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 </div>
 
 <script>
+/* ===== constants ===== */
 const HEX=['#d4563f','#d79a3a','#c9b845','#5db56f','#3aabba','#3f7fd4','#7a5bd6','#c25bb8','#2e8ca8'];
 const STATUSES={done:'انجام شده',doing:'در حال انجام',hold:'معلق',none:'انجام نشده'};
 const STATUS_CLASS={done:'st-done',doing:'st-doing',hold:'st-hold',none:'st-none'};
+const CASH_STAGE_NAME='نشستن در حساب';
 const DEFAULT_STAGES=[
  {name:'تهیه و تنظیم صورت وضعیت',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
  {name:'بررسی اولیه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
@@ -619,16 +615,19 @@ const DEFAULT_STAGES=[
  {name:'تحویل روکش نامه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
  {name:'تهیه فرم های 7 گانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
  {name:'تحویل نسخه نهایی به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'پیگیری تا حصول نتیجه نهایی',resp:'',start:'',end:'',progress:0,status:'none',notes:''}
+ {name:'پیگیری تا حصول نتیجه نهایی',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'}
 ];
 const DEFAULT_ADJUSTMENT_STAGES=[
   {name:'دریافت نامه تعدیل',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
   {name:'تهیه محاسبات تعدیل',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
   {name:'ارائه به مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
   {name:'دریافت امضا و تأیید',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
-  {name:'ارائه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''}
+  {name:'ارائه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'}
 ];
 
+/* ===== state ===== */
 let DB=null, cur={st:null,inv:null}, donutChart=null;
 const UNDO_MAX=50;
 let UNDO_STACK=[];
@@ -652,6 +651,11 @@ function invNumericValue(key){
   return isNaN(n)?null:n;
 }
 function invTypeOf(key,inv){return (inv&&inv.type)||parseKey(key).type||'normal';}
+function isCashed(inv){
+  if(!inv||!Array.isArray(inv.stages))return false;
+  const s=inv.stages.find(x=>x&&x.name&&x.name.trim()===CASH_STAGE_NAME);
+  return !!(s&&(+s.progress||0)>=100);
+}
 
 function computeCumulativeForStation(st){
   if(!st||!st.invoices)return;
@@ -712,7 +716,7 @@ function undoLast(){
 }
 
 function exportDbForBackup(){
-  const out={version:5,lastModified:DB.lastModified||new Date().toISOString(),stations:[]};
+  const out={version:6,lastModified:DB.lastModified||new Date().toISOString(),stations:[]};
   DB.stations.forEach(st=>{
     const arr=[];
     Object.keys(st.invoices||{}).forEach(k=>{
@@ -779,6 +783,17 @@ function migrateOldInvoices(st){
   });
   st.invoices=out;
 }
+function migrateCashStage(st){
+  if(!st||!st.invoices)return;
+  Object.keys(st.invoices).forEach(k=>{
+    const inv=st.invoices[k];
+    if(!inv||!Array.isArray(inv.stages))return;
+    const has=inv.stages.some(x=>x&&x.name&&x.name.trim()===CASH_STAGE_NAME);
+    if(has)return;
+    const cashStage={name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'};
+    inv.stages.push(cashStage);
+  });
+}
 function load(){
   try{DB=JSON.parse(localStorage.getItem('mokho_db'))}catch(e){DB=null}
   if(!DB||!DB.stations||!DB.stations.length) DB={stations:[
@@ -789,6 +804,7 @@ function load(){
     {id:uid(),name:'فردیس',invoices:{}}
   ]};
   DB.stations.forEach(st=>migrateOldInvoices(st));
+  DB.stations.forEach(st=>migrateCashStage(st));
   computeAllCumulative();
   cur.st=DB.stations[0].id;
   try{const t=JSON.parse(localStorage.getItem('mokho_titles'));if(t&&t.title)APP_TITLES=t;}catch(e){}
@@ -973,15 +989,18 @@ function renderSummaryTable(){
     const normals=invs.filter(([,v])=>(!v.type||v.type==='normal'));
     const adjs=invs.filter(([,v])=>v.type==='adjustment');
     function classify(list){
-      let done=0,inprog=0,critic=0;
+      let done=0,inprog=0,critic=0,cashed=0;
       list.forEach(([,inv])=>{
         const stages=inv.stages||[];
         const total=stages.length;if(!total)return;
         const prog=stages.filter(s=>s.status==='done').length;
         const hasCritic=stages.some(s=>s.status==='critical');
-        if(hasCritic)critic++;else if(prog===total)done++;else inprog++;
+        if(isCashed(inv))cashed++;
+        if(hasCritic)critic++;
+        else if(prog===total)done++;
+        else inprog++;
       });
-      return{done,inprog,critic};
+      return{done,inprog,critic,cashed};
     }
     const ns=classify(normals);const as=classify(adjs);
     const allCritic=ns.critic+as.critic;
@@ -990,7 +1009,7 @@ function renderSummaryTable(){
     return{name:st.name,nCount:normals.length,aCount:adjs.length,ns,as,statusIcon};
   });
   const thead=`<tr><th>ایستگاه</th><th>صورت وضعیت</th><th>تعدیل</th><th>انجام‌شده</th><th>در حال اجرا</th><th>نقد شده</th><th>وضعیت</th></tr>`;
-  const tbody=rows.map(r=>`<tr><td>${r.name}</td><td>${r.nCount}</td><td>${r.aCount}</td><td>${r.ns.done+r.as.done}</td><td>${r.ns.inprog+r.as.inprog}</td><td>${r.ns.critic+r.as.critic}</td><td style="text-align:center;font-size:1.1rem">${r.statusIcon}</td></tr>`).join('');
+  const tbody=rows.map(r=>`<tr><td>${r.name}</td><td>${r.nCount}</td><td>${r.aCount}</td><td>${r.ns.done+r.as.done}</td><td>${r.ns.inprog+r.as.inprog}</td><td style="font-weight:800;color:oklch(45% 0.13 155)">${r.ns.cashed+r.as.cashed}</td><td style="text-align:center;font-size:1.1rem">${r.statusIcon}</td></tr>`).join('');
   const collapsed=localStorage.getItem(SUMMARY_COLLAPSE_KEY)==='1';
   container.innerHTML=`
     <div class="summary-header ${collapsed?'collapsed':''}" id="summaryHeader">
@@ -1231,7 +1250,7 @@ function openStageModal(idx){
   const nameEl=document.getElementById('f_name');if(nameEl)nameEl.focus();
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('show');window.__stageStartPicker=null;window.__stageEndPicker=null;}
-document.getElementById('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal();});
+/* غیرفعال شد: بستن مودال مرحله با کلیک پس‌زمینه */
 function saveStage(idx){
   const inv=curInvoice();if(!inv)return;
   pushUndo();
@@ -1382,7 +1401,7 @@ function closeAddInv(){
   document.getElementById('typeAdj').style.pointerEvents='';
   pickerFrom=null;pickerTo=null;
 }
-document.getElementById('addInvOverlay').addEventListener('click',e=>{if(e.target.id==='addInvOverlay')closeAddInv();});
+/* غیرفعال شد: بستن مودال صورت‌وضعیت با کلیک پس‌زمینه */
 document.getElementById('typeNormal').onclick=()=>{
   if(ADD_INV_MODE==='edit')return;
   ADD_INV_TYPE='normal';
@@ -1509,6 +1528,7 @@ function restoreJSON(input){
       if(!confirm('بازیابی پشتیبان، داده‌های فعلی را جایگزین می‌کند. ادامه؟'))return;
       pushUndo();
       DB=importDbFromBackup(d);
+      DB.stations.forEach(st=>migrateCashStage(st));
       computeAllCumulative();
       cur.st=DB.stations[0]?DB.stations[0].id:null;cur.inv=null;
       renderAll();alert('بازیابی با موفقیت انجام شد ✅');
@@ -1518,7 +1538,6 @@ function restoreJSON(input){
   r.readAsText(f);
 }
 
-/* ===== چاپ یک صورت‌وضعیت (بدون باکس مالی) ===== */
 function printReport(){
   const s=curStation(),inv=curInvoice();
   if(!s||!inv)return alert('ابتدا ایستگاه و شماره صورت وضعیت را انتخاب کنید');
@@ -1632,11 +1651,10 @@ function openReport(){
   document.getElementById('reportOverlay').classList.add('show');
 }
 function closeReport(){document.getElementById('reportOverlay').classList.remove('show');}
-document.getElementById('reportOverlay').addEventListener('click',e=>{if(e.target.id==='reportOverlay')closeReport();});
+/* غیرفعال شد: بستن مودال گزارش با کلیک پس‌زمینه */
 document.getElementById('reportStationSel').onchange=renderReport;
 document.getElementById('reportTypeSel').onchange=renderReport;
 
-/* ===== خروجی اکسل: جدول + شیت نمودار + شیت KPI ===== */
 function exportReportToExcel(){
   if(typeof XLSX==='undefined'){alert('کتابخانه SheetJS بارگذاری نشده است.');return;}
   const stationFilter=document.getElementById('reportStationSel').value;
@@ -1647,13 +1665,11 @@ function exportReportToExcel(){
   const typeTxt=typeFilter==='all'?'همه':(typeFilter==='normal'?'فقط صورت وضعیت':'فقط تعدیل');
   const wb=XLSX.utils.book_new();
 
-  /* --- شیت ۱: Report (جدول) --- */
   const dataReport=[];
   dataReport.push(['ردیاب صورت وضعیت مکو — گزارش مبالغ']);
   dataReport.push(['ایستگاه: '+filterTxt,'نوع: '+typeTxt]);
   dataReport.push([]);
   dataReport.push(['نام ایستگاه','نوع','شماره','از تاریخ','تا تاریخ','مبلغ دوره (ریال)','مبلغ تعدیل (ریال)','مبلغ تجمعی (ریال)']);
-  const dataRowsStartIdx=dataReport.length; /* محاسبه ردیف شروع داده‌های واقعی */
   rows.forEach(r=>{
     if(r.subtotal){
       dataReport.push([r.station,'جمع ایستگاه','','','', r.netRaw||0, r.adjRaw||0, r.cumRaw||0]);
@@ -1672,11 +1688,9 @@ function exportReportToExcel(){
   dataReport.push(['جمع کل','','','','',totalNet,totalAdj,totalCum]);
   const wsReport=XLSX.utils.aoa_to_sheet(dataReport);
   wsReport['!cols']=[{wch:18},{wch:14},{wch:10},{wch:14},{wch:14},{wch:20},{wch:20},{wch:20}];
-  /* RTL + سبک راست‌به‌چپ */
   wsReport['!views']=[{RTL:true}];
   XLSX.utils.book_append_sheet(wb,wsReport,'Report');
 
-  /* --- شیت ۲: Chart (جدول داده + نمودار ستونی) --- */
   const dataChart=[];
   dataChart.push(['نام ایستگاه','مبلغ دوره (ریال)','مبلغ تعدیل (ریال)','مبلغ تجمعی (ریال)']);
   rows.forEach(r=>{
@@ -1693,7 +1707,6 @@ function exportReportToExcel(){
   wsChart['!views']=[{RTL:true}];
   XLSX.utils.book_append_sheet(wb,wsChart,'ChartData');
 
-  /* --- شیت ۳: KPI --- */
   const dataKPI=[];
   dataKPI.push(['شاخص','مقدار']);
   dataKPI.push(['تعداد ردیف‌های آیتم', rows.filter(r=>!r.subtotal).length]);
@@ -1706,14 +1719,9 @@ function exportReportToExcel(){
   wsKPI['!views']=[{RTL:true}];
   XLSX.utils.book_append_sheet(wb,wsKPI,'KPI');
 
-  /* --- درج نمودار ستونی داخل شیت ChartData با SheetJS (xlsx.full.min.js پشتیبانی محدود دارد) --- */
-  /* در نسخه community، ساخت chart واقعی امکان‌پذیر نیست؛ اما داده ساختارمند آماده درج در Excel است.
-     برای نمایش بهتر، جدول را با ۳ ستون عددی در کنار هم قرار دادیم تا کاربر با یک کلیک نمودار بسازد. */
-
   XLSX.writeFile(wb,'mokho_report_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
-/* ===== چاپ گزارش (بدون باکس مالی و بدون تاریخ) ===== */
 function printReportModal(){
   const stationFilter=document.getElementById('reportStationSel').value;
   const typeFilter=document.getElementById('reportTypeSel').value;
@@ -1728,7 +1736,6 @@ function printReportModal(){
     body+=`<tr><td>${esc(r.station)}</td><td>${typeFa}</td><td>${esc(r.num)}</td><td>${jalaliFmt(r.fromRaw)}</td><td>${jalaliFmt(r.toRaw)}</td><td>${r.net}</td><td>${r.adj}</td><td>${r.cum}${r.isAuto?' (خودکار)':''}</td></tr>`;
   });
   body+=`<tr style="background:#e0f5e8;font-weight:800"><td colspan="5">جمع کل</td><td>${fmtMoney(totalNet)}</td><td>${fmtMoney(totalAdj)}</td><td>${fmtMoney(totalCum)}</td></tr>`;
-  /* فقط عنوان + زیرعنوان ایستگاه/نوع — بدون باکس مالی و بدون تاریخ */
   pa.innerHTML=`
     <div class="pr-title">گزارش صورت وضعیت‌ها و تعدیل‌ها — مکو</div>
     <div class="pr-sub">ایستگاه: <b>${esc(filterTxt)}</b> &nbsp;|&nbsp; نوع: <b>${typeFilter==='all'?'همه':(typeFilter==='normal'?'صورت وضعیت':'تعدیل')}</b></div>
@@ -2031,6 +2038,10 @@ function applyExcelImport(){
     else{inv.cumManual=false;inv.cumAuto=true;}
     const explicitName=r.name?String(r.name).trim():null;
     if(explicitName&&explicitName!==String(numRaw))inv.label=explicitName;
+    /* اطمینان از وجود مرحله نقد */
+    if(Array.isArray(inv.stages)&&!inv.stages.some(s=>s&&s.name&&s.name.trim()===CASH_STAGE_NAME)){
+      inv.stages.push({name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'});
+    }
   });
   DB.stations=baseStations;
   computeAllCumulative();
@@ -2093,7 +2104,9 @@ async function gistPull(){
         imported=remoteDb;
         imported.stations.forEach(st=>migrateOldInvoices(st));
       }
-      DB=imported;computeAllCumulative();
+      DB=imported;
+      DB.stations.forEach(st=>migrateCashStage(st));
+      computeAllCumulative();
       localStorage.setItem("mokho_db",JSON.stringify(DB));
       renderAll();
       let _pullCount=parseInt(localStorage.getItem("meco_pull_count")||"0",10)+1;
