@@ -1263,7 +1263,6 @@ function openStageModal(idx){
   const nameEl=document.getElementById('f_name');if(nameEl)nameEl.focus();
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('show');window.__stageStartPicker=null;window.__stageEndPicker=null;}
-document.getElementById('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal();});
 function saveStage(idx){
   const inv=curInvoice();if(!inv)return;
   pushUndo();
@@ -1414,7 +1413,6 @@ function closeAddInv(){
   document.getElementById('typeAdj').style.pointerEvents='';
   pickerFrom=null;pickerTo=null;
 }
-document.getElementById('addInvOverlay').addEventListener('click',e=>{if(e.target.id==='addInvOverlay')closeAddInv();});
 document.getElementById('typeNormal').onclick=()=>{
   if(ADD_INV_MODE==='edit')return;
   ADD_INV_TYPE='normal';
