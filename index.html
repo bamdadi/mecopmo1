@@ -619,6 +619,7 @@ const DEFAULT_STAGES=[
  {name:'تحویل روکش نامه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
  {name:'تهیه فرم های 7 گانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
  {name:'تحویل نسخه نهایی به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+ {name:'نشستن در حساب',resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'},
  {name:'پیگیری تا حصول نتیجه نهایی',resp:'',start:'',end:'',progress:0,status:'none',notes:''}
 ];
 const DEFAULT_ADJUSTMENT_STAGES=[
@@ -626,9 +627,9 @@ const DEFAULT_ADJUSTMENT_STAGES=[
   {name:'تهیه محاسبات تعدیل',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
   {name:'ارائه به مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
   {name:'دریافت امضا و تأیید',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
-  {name:'ارائه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''}
+  {name:'ارائه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'نشستن در حساب',resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'}
 ];
-
 let DB=null, cur={st:null,inv:null}, donutChart=null;
 const UNDO_MAX=50;
 let UNDO_STACK=[];
@@ -779,6 +780,27 @@ function migrateOldInvoices(st){
   });
   st.invoices=out;
 }
+function migrateCashStage(st){
+  if(!st||!st.invoices)return;
+  const CASH_NAME='نشستن در حساب';
+  Object.keys(st.invoices).forEach(k=>{
+    const inv=st.invoices[k];
+    if(!inv||!Array.isArray(inv.stages))return;
+    const has=inv.stages.some(x=>x&&x.name&&x.name.trim()===CASH_NAME);
+    if(has)return;
+    /* افزودن مرحله نقد قبل از آخرین مرحله (پیگیری) در صورت وجود */
+    const cashStage={name:CASH_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'};
+    if(inv.type==='adjustment'){
+      /* در تعدیل، در انتها */
+      inv.stages.push(cashStage);
+    }else{
+      /* در صورت‌وضعیت، قبل از «پیگیری تا حصول نتیجه نهایی» */
+      const idx=inv.stages.findIndex(x=>x&&x.name&&x.name.indexOf('پیگیری')>-1);
+      if(idx>=0)inv.stages.splice(idx,0,cashStage);
+      else inv.stages.push(cashStage);
+    }
+  });
+}
 function load(){
   try{DB=JSON.parse(localStorage.getItem('mokho_db'))}catch(e){DB=null}
   if(!DB||!DB.stations||!DB.stations.length) DB={stations:[
@@ -789,6 +811,7 @@ function load(){
     {id:uid(),name:'فردیس',invoices:{}}
   ]};
   DB.stations.forEach(st=>migrateOldInvoices(st));
+DB.stations.forEach(st=>migrateCashStage(st));
   computeAllCumulative();
   cur.st=DB.stations[0].id;
   try{const t=JSON.parse(localStorage.getItem('mokho_titles'));if(t&&t.title)APP_TITLES=t;}catch(e){}
@@ -972,16 +995,25 @@ function renderSummaryTable(){
     const invs=Object.entries(st.invoices||{});
     const normals=invs.filter(([,v])=>(!v.type||v.type==='normal'));
     const adjs=invs.filter(([,v])=>v.type==='adjustment');
+    /* بررسی نقد شدن: مرحله «نشستن در حساب» با درصد ۱۰۰ */
+    function isCashed(inv){
+      if(!inv||!Array.isArray(inv.stages))return false;
+      const s=inv.stages.find(x=>x&&x.name&&x.name.trim()==='نشستن در حساب');
+      return !!(s&&(+s.progress||0)>=100);
+    }
     function classify(list){
-      let done=0,inprog=0,critic=0;
+      let done=0,inprog=0,critic=0,cashed=0;
       list.forEach(([,inv])=>{
         const stages=inv.stages||[];
         const total=stages.length;if(!total)return;
         const prog=stages.filter(s=>s.status==='done').length;
         const hasCritic=stages.some(s=>s.status==='critical');
-        if(hasCritic)critic++;else if(prog===total)done++;else inprog++;
+        if(isCashed(inv))cashed++;
+        if(hasCritic)critic++;
+        else if(prog===total)done++;
+        else inprog++;
       });
-      return{done,inprog,critic};
+      return{done,inprog,critic,cashed};
     }
     const ns=classify(normals);const as=classify(adjs);
     const allCritic=ns.critic+as.critic;
@@ -990,7 +1022,7 @@ function renderSummaryTable(){
     return{name:st.name,nCount:normals.length,aCount:adjs.length,ns,as,statusIcon};
   });
   const thead=`<tr><th>ایستگاه</th><th>صورت وضعیت</th><th>تعدیل</th><th>انجام‌شده</th><th>در حال اجرا</th><th>نقد شده</th><th>وضعیت</th></tr>`;
-  const tbody=rows.map(r=>`<tr><td>${r.name}</td><td>${r.nCount}</td><td>${r.aCount}</td><td>${r.ns.done+r.as.done}</td><td>${r.ns.inprog+r.as.inprog}</td><td>${r.ns.critic+r.as.critic}</td><td style="text-align:center;font-size:1.1rem">${r.statusIcon}</td></tr>`).join('');
+  const tbody=rows.map(r=>`<tr><td>${r.name}</td><td>${r.nCount}</td><td>${r.aCount}</td><td>${r.ns.done+r.as.done}</td><td>${r.ns.inprog+r.as.inprog}</td><td style="font-weight:800;color:oklch(45% 0.13 155)">${r.ns.cashed+r.as.cashed}</td><td style="text-align:center;font-size:1.1rem">${r.statusIcon}</td></tr>`).join('');
   const collapsed=localStorage.getItem(SUMMARY_COLLAPSE_KEY)==='1';
   container.innerHTML=`
     <div class="summary-header ${collapsed?'collapsed':''}" id="summaryHeader">
