@@ -78,6 +78,8 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 .btn-push:hover{background:#1d4ed8;}
 .btn-pull{background:#16a34a;color:#fff;}
 .btn-pull:hover{background:#15803d;}
+.btn-templates{background:oklch(65% 0.14 340);color:#fff}
+.btn-manage-tpl{background:oklch(55% 0.15 320);color:#fff}
 
 #content{padding:20px 24px;flex:1}
 
@@ -163,13 +165,12 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 
 #printArea{display:none}
 @media print{
-  @page{size:A4;margin:15mm 12mm}
   body{display:block;background:#fff;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:'Vazirmatn',Tahoma,sans-serif}
-  #sidebar,#topbar,#content,#modalBg,#pageFooter,#addInvOverlay,#reportOverlay,#jdatePop,#logoutOverlay,#excelOverlay,#confirmAllOverlay,
-  #invInfoStrip,#mtUserBar,#summaryTableContainer,#stagesGrid,.dashboard-wrap,.section-title{display:none!important}
+  #sidebar,#topbar,#content,#modalBg,#pageFooter,#addInvOverlay,#reportOverlay,#jdatePop,#logoutOverlay,#excelOverlay,#confirmAllOverlay,#templatesOverlay,#manageTplOverlay,#mtUserBar,
+  #invInfoStrip,#summaryTableContainer,#stagesGrid,.dashboard-wrap,.section-title{display:none!important}
   #printArea{display:block!important;direction:rtl;font-family:'Vazirmatn',Tahoma,sans-serif}
   *{box-shadow:none!important;background-image:none!important}
-  #printArea .pr-title{text-align:center;font-size:15pt;font-weight:900;color:#1e3a5f;margin-bottom:8px;font-family:'Vazirmatn',Tahoma,sans-serif;letter-spacing:0}
+  #printArea .pr-title{text-align:center;font-size:15pt;font-weight:900;color:#1e3a5f;margin-bottom:8px;font-family:'Vazirmatn',Tahoma,sans-serif}
   #printArea .pr-sub{text-align:center;font-size:10.5pt;color:#444;margin-bottom:16px;font-family:'Vazirmatn',Tahoma,sans-serif;font-weight:600}
   #printArea table{width:100%;border-collapse:collapse;font-size:10pt;font-family:'Vazirmatn',Tahoma,sans-serif}
   #printArea tr{page-break-inside:avoid}
@@ -178,6 +179,21 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   #printArea .signs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:46px;text-align:center;font-size:10pt;font-family:'Vazirmatn',Tahoma,sans-serif}
   #printArea .signs div{border-top:1px solid #333;padding-top:6px}
   #printArea .pr-footer{margin-top:26px;text-align:center;font-size:9pt;color:#444;border-top:1px solid #999;padding-top:8px;line-height:1.8;font-family:'Vazirmatn',Tahoma,sans-serif}
+  /* حالت پیش‌فرض: عمودی */
+  @page{size:A4 portrait;margin:15mm 12mm}
+}
+/* حالت افقی مخصوص گزارش مبالغ */
+@media print{
+  body.print-landscape{
+    /* نسبت اندازه */
+  }
+  /* جهت چاپ افقی برای گزارش مبالغ */
+@page landscapePage{size:A4 landscape;margin:10mm 8mm}
+  body.print-landscape #printArea table{font-size:8.5pt}
+  body.print-landscape #printArea th,
+  body.print-landscape #printArea td{padding:3px 4px}
+  body.print-landscape #printArea .pr-title{font-size:14pt;margin-bottom:4px}
+  body.print-landscape #printArea .pr-sub{font-size:9.5pt;margin-bottom:10px}
 }
 @media (max-width:820px){
   body{flex-direction:column}
@@ -206,7 +222,7 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 
 #addInvOverlay{position:fixed;inset:0;background:oklch(15% 0.02 220 / .55);display:none;align-items:center;justify-content:center;z-index:110;backdrop-filter:blur(3px)}
 #addInvOverlay.show{display:flex}
-#addInvBox{background:var(--card);border-radius:18px;width:min(620px,94vw);max-height:92vh;overflow-y:auto;padding:24px}
+#addInvBox{background:var(--card);border-radius:18px;width:min(680px,94vw);max-height:92vh;overflow-y:auto;padding:24px}
 #addInvBox h2{font-size:1.05rem;margin-bottom:14px;color:var(--accent-dark);font-weight:800}
 #addInvBox label{display:block;font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:5px;margin-top:10px}
 #addInvBox label.req::after{content:' *';color:oklch(60% 0.18 25);font-weight:800}
@@ -220,6 +236,7 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 #addInvBox .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 #addInvBox .hidden{display:none!important}
 #addInvBox .cum-hint{font-size:.7rem;color:var(--muted);margin-top:4px;line-height:1.6}
+#addInvBox .section-label{font-size:.72rem;color:var(--accent-dark);font-weight:800;margin-top:14px;padding-top:10px;border-top:1px dashed var(--border);letter-spacing:.5px}
 
 .jdp-wrap{position:relative}
 .jdp-display{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.9rem;font-family:inherit;background:var(--bg-main);color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:.15s}
@@ -251,26 +268,39 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 #invInfoStrip .info-cell .val{font-size:.85rem;font-weight:800;color:var(--accent-dark);direction:ltr;text-align:right}
 #invInfoStrip .info-cell .val.fa{direction:rtl;font-weight:700}
 #invInfoStrip .info-cell.adj .val{color:oklch(55% 0.15 70)}
+#invInfoStrip .info-cell.contractor .val{color:oklch(55% 0.13 250)}
+#invInfoStrip .info-cell.consultant .val{color:oklch(55% 0.13 300)}
+#invInfoStrip .info-cell.employer .val{color:oklch(50% 0.14 150)}
 
 #reportOverlay{position:fixed;inset:0;background:oklch(15% 0.02 220 / .6);display:none;align-items:center;justify-content:center;z-index:120;backdrop-filter:blur(3px)}
 #reportOverlay.show{display:flex}
-#reportBox{background:var(--card);border-radius:18px;width:min(1000px,96vw);max-height:92vh;overflow-y:auto;padding:22px}
+#reportBox{background:var(--card);border-radius:18px;width:min(1400px,98vw);max-height:94vh;overflow-y:auto;padding:22px}
 #reportBox h2{font-size:1.05rem;margin-bottom:6px;color:var(--accent-dark);font-weight:800}
 #reportBox .sub{font-size:.78rem;color:var(--muted);margin-bottom:14px}
-#reportBox .ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-#reportBox .ctrl label{font-size:.8rem;color:var(--muted);font-weight:700}
-#reportBox .ctrl select{padding:7px 12px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:.85rem;background:var(--bg-main);color:var(--text)}
-#reportBox table.rep-tbl{width:100%;border-collapse:collapse;font-size:.82rem}
-#reportBox table.rep-tbl th,#reportBox table.rep-tbl td{border:1px solid var(--border);padding:7px 10px;text-align:right}
-#reportBox table.rep-tbl th{background:var(--accent);color:#fff;font-weight:800;font-size:.78rem}
+#reportBox .ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:10px 12px;background:var(--bg-main);border-radius:10px;border:1px solid var(--border)}
+#reportBox .ctrl .group{display:flex;gap:6px;align-items:center}
+#reportBox .ctrl label{font-size:.78rem;color:var(--muted);font-weight:700}
+#reportBox .ctrl select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.82rem;background:var(--card);color:var(--text)}
+#reportBox .ctrl .chk{display:inline-flex;gap:5px;align-items:center;font-size:.78rem;color:var(--text);cursor:pointer;padding:5px 9px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-weight:700}
+#reportBox .ctrl .chk input{margin:0;cursor:pointer}
+#reportBox .ctrl .chk input[type=number]{width:60px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:inherit;text-align:center;font-size:.8rem}
+#reportBox table.rep-tbl{width:100%;border-collapse:collapse;font-size:.76rem}
+#reportBox table.rep-tbl th,#reportBox table.rep-tbl td{border:1px solid var(--border);padding:5px 7px;text-align:right;white-space:nowrap}
+#reportBox table.rep-tbl th{background:var(--accent);color:#fff;font-weight:800;font-size:.7rem;position:sticky;top:0;z-index:2}
+#reportBox table.rep-tbl th.overhead{background:oklch(55% 0.15 75)}
+#reportBox table.rep-tbl th.vat{background:oklch(50% 0.15 45)}
+#reportBox table.rep-tbl th.totalcol{background:oklch(45% 0.14 155)}
 #reportBox table.rep-tbl td.num{direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
-#reportBox table.rep-tbl tr.grp td{background:oklch(95% 0.02 200);font-weight:800;color:var(--accent-dark)}
-#reportBox table.rep-tbl tr.total td{background:oklch(93% 0.05 155);font-weight:800;color:oklch(38% 0.12 155)}
+#reportBox table.rep-tbl td.approved{background:oklch(97% 0.02 250)}
+#reportBox table.rep-tbl td.overhead-cell{background:oklch(98% 0.03 75);direction:ltr;text-align:right;font-weight:700;color:oklch(45% 0.14 75)}
+#reportBox table.rep-tbl td.vat-cell{background:oklch(98% 0.03 45);direction:ltr;text-align:right;font-weight:700;color:oklch(45% 0.14 45)}
+#reportBox table.rep-tbl td.total-cell{background:oklch(96% 0.04 155);direction:ltr;text-align:right;font-weight:800;color:oklch(35% 0.14 155)}
+#reportBox table.rep-tbl tr.total-row td{background:oklch(93% 0.05 155);font-weight:800;color:oklch(38% 0.12 155)}
 #reportBox .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
-#reportBox .type-badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.68rem;font-weight:700}
+#reportBox .type-badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.64rem;font-weight:700}
 #reportBox .type-badge.normal{background:oklch(93% 0.06 200);color:oklch(42% 0.13 220)}
 #reportBox .type-badge.adj{background:oklch(93% 0.06 75);color:oklch(45% 0.13 70)}
-#reportBox .auto-tag{display:inline-block;background:oklch(93% 0.06 155);color:oklch(42% 0.12 155);border-radius:8px;font-size:.62rem;padding:1px 5px;margin-inline-start:4px;font-weight:700}
+#reportBox .auto-tag{display:inline-block;background:oklch(93% 0.06 155);color:oklch(42% 0.12 155);border-radius:8px;font-size:.58rem;padding:1px 5px;margin-inline-start:3px;font-weight:700}
 
 #logoutOverlay{position:fixed;inset:0;z-index:99998;background:radial-gradient(circle at 50% 45%,#1a0533 0%,#0a0118 100%);display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;direction:rtl;font-family:Vazirmatn,Tahoma,sans-serif}
 #logoutOverlay.show{display:flex}
@@ -280,34 +310,14 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 #logoutOverlay .lo-btn{padding:14px 44px;border:none;border-radius:12px;background:linear-gradient(135deg,#a855f7,#38bdf8);color:#0a0118;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;letter-spacing:2px;opacity:0;transition:opacity .5s,transform .15s;box-shadow:0 8px 30px rgba(168,85,247,.5)}
 #logoutOverlay .lo-btn.show{opacity:1}
 #logoutOverlay .lo-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
-@keyframes loDriveAway{
-  0%{transform:translateX(0);opacity:1}
-  80%{transform:translateX(700px);opacity:1}
-  100%{transform:translateX(900px);opacity:0}
-}
+@keyframes loDriveAway{0%{transform:translateX(0);opacity:1}80%{transform:translateX(700px);opacity:1}100%{transform:translateX(900px);opacity:0}}
 #logoutOverlay .lo-bus.drive{animation:loDriveAway 2.6s cubic-bezier(.5,.05,.3,1) forwards}
 #logoutOverlay .lo-bolt.drive{animation:loDriveAway 2.6s cubic-bezier(.5,.05,.3,1) forwards}
 #logoutOverlay .lo-beam.fade{opacity:0;transition:opacity .6s}
-
-.lo-charge-circle{
-  position:absolute;left:69px;top:174px;transform:translate(-50%,-50%);
-  width:36px;height:36px;border-radius:50%;
-  background:conic-gradient(#22c55e 0deg, rgba(255,255,255,.08) 0deg);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 12px rgba(34,197,94,.5),inset 0 0 8px rgba(0,0,0,.5);
-  opacity:0;transition:opacity .4s;z-index:5;
-  border:1px solid rgba(168,85,247,.5);
-}
-.lo-charge-circle::before{
-  content:'';position:absolute;inset:4px;border-radius:50%;
-  background:radial-gradient(circle at 50% 40%,#1a0533 0%,#0a0118 100%);
-}
+.lo-charge-circle{position:absolute;left:69px;top:174px;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:conic-gradient(#22c55e 0deg, rgba(255,255,255,.08) 0deg);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(34,197,94,.5),inset 0 0 8px rgba(0,0,0,.5);opacity:0;transition:opacity .4s;z-index:5;border:1px solid rgba(168,85,247,.5)}
+.lo-charge-circle::before{content:'';position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#1a0533 0%,#0a0118 100%)}
 .lo-charge-circle.show{opacity:1}
-.lo-charge-circle .lo-charge-txt{
-  position:relative;z-index:2;color:#fff;font-weight:800;font-size:.6rem;
-  font-family:Vazirmatn,Tahoma,sans-serif;text-shadow:0 0 6px rgba(34,197,94,.7);
-  transition:color .3s;line-height:1;
-}
+.lo-charge-circle .lo-charge-txt{position:relative;z-index:2;color:#fff;font-weight:800;font-size:.6rem;font-family:Vazirmatn,Tahoma,sans-serif;text-shadow:0 0 6px rgba(34,197,94,.7);transition:color .3s;line-height:1}
 .lo-charge-circle.done .lo-charge-txt{color:#22c55e;}
 
 #excelOverlay{position:fixed;inset:0;background:oklch(15% 0.02 220 / .6);display:none;align-items:center;justify-content:center;z-index:130;backdrop-filter:blur(3px)}
@@ -342,6 +352,59 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 #confirmAllBox p{font-size:.85rem;color:var(--text);line-height:1.9;margin-bottom:6px}
 #confirmAllBox .warn{font-size:.78rem;color:oklch(55% 0.17 25);margin-top:8px}
 #confirmAllBox .actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
+
+#templatesOverlay{position:fixed;inset:0;background:oklch(15% 0.02 220 / .6);display:none;align-items:center;justify-content:center;z-index:135;backdrop-filter:blur(3px)}
+#templatesOverlay.show{display:flex}
+#templatesBox{background:var(--card);border-radius:18px;width:min(880px,96vw);max-height:92vh;overflow-y:auto;padding:24px}
+#templatesBox h2{font-size:1.05rem;margin-bottom:6px;color:var(--accent-dark);font-weight:800}
+#templatesBox .sub{font-size:.78rem;color:var(--muted);margin-bottom:16px;line-height:1.8}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.tpl-card{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;transition:.15s}
+.tpl-card:hover{border-color:var(--accent);box-shadow:0 4px 14px oklch(50% 0.03 220 / .12)}
+.tpl-card .head{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--primary,#1e3a5f);font-size:.92rem}
+.tpl-card .desc{font-size:.72rem;color:var(--muted);flex:1;line-height:1.8}
+.tpl-card .acts{display:flex;gap:6px;flex-wrap:wrap}
+.tpl-card .acts button{flex:1;min-width:80px;border:none;border-radius:8px;padding:7px 10px;font-size:.74rem;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit}
+.tpl-card .acts .dl-word{background:oklch(55% 0.15 250);color:#fff}
+.tpl-card .acts .dl-excel{background:oklch(58% 0.15 145);color:#fff}
+.tpl-card .acts button:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.tpl-card .acts button:disabled{opacity:.35;cursor:not-allowed}
+#templatesBox .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.tpl-note{background:oklch(97% 0.03 200);border-inline-start:4px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--text);line-height:1.8;margin-bottom:14px}
+
+#manageTplOverlay{position:fixed;inset:0;background:oklch(15% 0.02 220 / .7);display:none;align-items:center;justify-content:center;z-index:136;backdrop-filter:blur(3px)}
+#manageTplOverlay.show{display:flex}
+#manageTplBox{background:var(--card);border-radius:18px;width:min(920px,96vw);max-height:94vh;overflow-y:auto;padding:24px}
+#manageTplBox h2{font-size:1.05rem;margin-bottom:6px;color:var(--accent-dark);font-weight:800}
+#manageTplBox .sub{font-size:.78rem;color:var(--muted);margin-bottom:14px;line-height:1.8}
+.tpl-mng-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.tpl-mng-card{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:12px}
+.tpl-mng-card .head{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.9rem;margin-bottom:8px}
+.tpl-mng-card .head .swatch{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.tpl-mng-card .row{font-size:.72rem;color:var(--muted);margin-bottom:4px}
+.tpl-mng-card .acts{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tpl-mng-card .acts button{flex:1;min-width:60px;border:none;border-radius:7px;padding:6px 8px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit}
+.tpl-mng-card .acts .b-edit{background:oklch(65% 0.13 200);color:#fff}
+.tpl-mng-card .acts .b-upload{background:oklch(55% 0.15 250);color:#fff}
+.tpl-mng-card .acts .b-del{background:oklch(60% 0.18 25);color:#fff}
+.tpl-mng-card .acts button:hover{filter:brightness(1.1)}
+.tpl-mng-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.tpl-mng-actions .add{background:oklch(58% 0.15 145);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.85rem}
+.tpl-mng-actions .close{background:var(--bg-sidebar);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.85rem}
+.tpl-edit-form{background:var(--bg-main);border-radius:10px;padding:14px;margin-top:10px;display:none}
+.tpl-edit-form.show{display:block}
+.tpl-edit-form label{font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-top:8px;margin-bottom:4px}
+.tpl-edit-form input[type=text],.tpl-edit-form textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:.82rem;background:#fff}
+.tpl-edit-form textarea{min-height:120px;font-family:monospace;direction:ltr;font-size:.72rem}
+.tpl-edit-form .color-row{display:flex;gap:8px;align-items:center}
+.tpl-edit-form .color-row input[type=color]{width:48px;height:36px;padding:2px;cursor:pointer}
+.tpl-edit-form .file-row{display:flex;gap:6px;align-items:center;margin-top:6px}
+.tpl-edit-form .file-row input[type=file]{flex:1;font-size:.72rem;font-family:inherit}
+.tpl-edit-form .file-info{font-size:.7rem;color:var(--muted);margin-top:2px}
+.tpl-edit-form .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.tpl-edit-form .actions button{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:700}
+.tpl-edit-form .actions .save{background:var(--accent);color:#fff}
+.tpl-edit-form .actions .cancel{background:var(--border);color:var(--text)}
 </style>
 </head>
 <body>
@@ -350,7 +413,7 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   <h1>⚡ <span id="appTitle" title="برای ویرایش کلیک کنید">ردیاب صورت وضعیت مکو</span><small id="appSub" title="برای ویرایش کلیک کنید">ایستگاه شارژ اتوبوس برقی</small></h1>
   <div class="station-list" id="stationList"></div>
   <button id="addStationBtn"><span id="addStationLabel">＋ افزودن ایستگاه</span></button><button id="editAddBtn" title="ویرایش متن دکمه" style="margin:0 14px 10px;padding:6px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-size:.85rem;color:oklch(55% 0.02 220)">✏️</button>
-  <div class="sidebar-footer">نسخه ۱.۶ — ذخیره‌سازی محلی مرورگر</div>
+  <div class="sidebar-footer">نسخه ۱.۸ — ذخیره‌سازی محلی مرورگر</div>
 </nav>
 
 <div id="main">
@@ -372,13 +435,15 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
     <div class="action-bar">
       <button class="btn btn-report" onclick="openReport()">📊 گزارش مبالغ</button>
       <button class="btn btn-excel" onclick="openExcelImport()">📥 فراخوانی از اکسل</button>
+      <button class="btn btn-templates" onclick="openTemplates()">📁 نامه‌های نمونه</button>
+	  <button class="btn btn-manage-tpl" id="btnManageTpl" onclick="openManageTpl()" style="display:none">⚙️ مدیریت قالب‌ها</button>
       <button class="btn btn-undo" id="undoBtn" onclick="undoLast()" title="بازگردانی آخرین تغییر" disabled>↩️ Undo</button>
       <button class="btn btn-push" onclick="gistPush()">☁️ Push</button>
       <button class="btn btn-pull" onclick="gistPull()">⬇️ Pull</button>
       <span id="syncStatus"></span>
       <button class="btn btn-print" onclick="printReport()">🖨 چاپ / PDF</button>
       <button class="btn btn-backup" onclick="backupJSON()">💾 پشتیبان JSON</button>
-      <button class="btn btn-excel-template" onclick="downloadExcelTemplate()">📄 دانلود قالب نمونه</button>
+      <button class="btn btn-excel-template" onclick="downloadExcelTemplate()">📄 دانلود قالب اکسل</button>
       <button class="btn btn-restore" onclick="document.getElementById('restoreFile').click()">📂 بازیابی</button>
       <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreJSON(this)">
     </div>
@@ -456,6 +521,7 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
     <label class="req">دوره — تا تاریخ</label>
     <div class="jdp-wrap" id="periodToWrap"></div>
 
+    <div class="section-label">💰 مبالغ اصلی</div>
     <div class="row2">
       <div>
         <label id="lblNet" class="req">مبلغ صورت وضعیت خالص دوره (ریال)</label>
@@ -473,6 +539,22 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
       <div class="cum-hint" id="cumHint"></div>
     </div>
 
+    <div class="section-label">📋 مبالغ تاییدی (اختیاری)</div>
+    <div class="row2">
+      <div>
+        <label>مبلغ اعلامی پیمانکار (ریال)</label>
+        <input id="addInvContractor" type="text" inputmode="numeric" placeholder="—" dir="ltr" style="text-align:right">
+      </div>
+      <div>
+        <label>مبلغ تاییدی مشاور (ریال)</label>
+        <input id="addInvConsultant" type="text" inputmode="numeric" placeholder="—" dir="ltr" style="text-align:right">
+      </div>
+    </div>
+    <div>
+      <label>مبلغ تاییدی کارفرما (ریال)</label>
+      <input id="addInvEmployer" type="text" inputmode="numeric" placeholder="—" dir="ltr" style="text-align:right">
+    </div>
+
     <div class="actions">
       <button class="btn btn-ghost" onclick="closeAddInv()">انصراف</button>
       <button class="btn btn-primary" onclick="confirmAddInv()" id="addInvOk">ایجاد</button>
@@ -483,16 +565,31 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 <div id="reportOverlay">
   <div id="reportBox">
     <h2>📊 گزارش صورت وضعیت‌ها و تعدیل‌ها</h2>
-    <div class="sub">ترتیب ستون‌ها: نام ایستگاه | نوع | شماره | از تاریخ | تا تاریخ | مبلغ دوره | مبلغ تعدیل | مبلغ تجمعی</div>
+    <div class="sub">با انتخاب فیلترها، محاسبات به‌صورت لحظه‌ای به‌روزرسانی می‌شود</div>
     <div class="ctrl">
-      <label>ایستگاه:</label>
-      <select id="reportStationSel"></select>
-      <label style="margin-inline-start:10px">نوع:</label>
-      <select id="reportTypeSel">
-        <option value="all">همه</option>
-        <option value="normal">فقط صورت وضعیت</option>
-        <option value="adjustment">فقط تعدیل</option>
-      </select>
+      <div class="group">
+        <label>ایستگاه:</label>
+        <select id="reportStationSel"></select>
+      </div>
+      <div class="group">
+        <label>نوع:</label>
+        <select id="reportTypeSel">
+          <option value="all">همه</option>
+          <option value="normal">فقط صورت وضعیت</option>
+          <option value="adjustment">فقط تعدیل</option>
+        </select>
+      </div>
+      <label class="chk" title="نمایش ستون‌های مبالغ اعلامی پیمانکار، تاییدی مشاور و کارفرما">
+        <input type="checkbox" id="chkApproved"> مبالغ تاییدی
+      </label>
+      <label class="chk" title="اعمال ضریب بالاسری به مبلغ خالص دوره">
+        <input type="checkbox" id="chkOverhead"> بالاسری
+        <input type="number" id="overheadPct" value="10" min="0" max="100" step="0.5" title="درصد بالاسری"> ٪
+      </label>
+      <label class="chk" title="محاسبه ارزش افزوده روی مبلغ با احتساب بالاسری">
+        <input type="checkbox" id="chkVat"> ارزش افزوده
+        <input type="number" id="vatPct" value="10" min="0" max="100" step="0.5" title="درصد ارزش افزوده"> ٪
+      </label>
     </div>
     <div id="reportTableWrap"></div>
     <div class="modal-actions">
@@ -507,9 +604,8 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   <div id="excelBox">
     <h2>📥 فراخوانی داده‌ها از فایل اکسل</h2>
     <div class="sub">
-      ترتیب ستون‌های فایل اکسل: <b>نام ایستگاه | نوع | شماره | مبلغ دوره | مبلغ تعدیل | از تاریخ | تا تاریخ</b><br>
-      مقدار ستون «نوع» می‌تواند «صورت وضعیت» یا «تعدیل» باشد. شماره هر ردیف در هر ایستگاه + نوع، یکتاست.
-      اگر شماره خالی باشد به‌صورت خودکار ساخته می‌شود.
+      ترتیب ستون‌های فایل اکسل: <b>نام ایستگاه | نوع | شماره | مبلغ دوره | مبلغ تعدیل | اعلامی پیمانکار | تاییدی مشاور | تاییدی کارفرما | از تاریخ | تا تاریخ</b><br>
+      ستون‌های مبالغ تاییدی اختیاری است. مقدار ستون «نوع» می‌تواند «صورت وضعیت» یا «تعدیل» باشد.
     </div>
     <div class="file-row">
       <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
@@ -529,6 +625,33 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
     <div class="actions">
       <button class="btn btn-ghost" onclick="closeExcelImport()">انصراف</button>
       <button class="btn btn-excel" id="excelApplyBtn" onclick="applyExcelImport()" disabled>📥 اعمال فراخوانی</button>
+    </div>
+  </div>
+</div>
+
+<div id="templatesOverlay">
+  <div id="templatesBox">
+    <h2>📁 نامه‌های نمونه مشاوران</h2>
+    <div class="sub">قالب‌های Word و Excel مشاوران را دریافت کنید. مدیر سیستم می‌تواند قالب‌ها را مدیریت و ویرایش کند.</div>
+    <div class="tpl-note">
+      📌 قالب‌های زیر قابل دریافت برای همه کاربران است. برای افزودن یا ویرایش قالب، فقط مدیر سیستم (admin) می‌تواند از دکمه «⚙️ مدیریت قالب‌ها» استفاده کند.
+    </div>
+    <div class="tpl-grid" id="tplGrid"></div>
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="closeTemplates()">بستن</button>
+    </div>
+  </div>
+</div>
+
+<div id="manageTplOverlay">
+  <div id="manageTplBox">
+    <h2>⚙️ مدیریت قالب‌های مشاوران (ویژه مدیر)</h2>
+    <div class="sub">افزودن، ویرایش، حذف مشاور، بارگذاری فایل Word و Excel، ویرایش متن نامه. همه‌چیز قابل تنظیم است.</div>
+    <div class="tpl-mng-grid" id="tplMngGrid"></div>
+    <div id="tplEditForm" class="tpl-edit-form"></div>
+    <div class="tpl-mng-actions">
+      <button class="add" onclick="startAddConsultant()">＋ افزودن مشاور جدید</button>
+      <button class="close" onclick="closeManageTpl()">بستن</button>
     </div>
   </div>
 </div>
@@ -602,29 +725,47 @@ const HEX=['#d4563f','#d79a3a','#c9b845','#5db56f','#3aabba','#3f7fd4','#7a5bd6'
 const STATUSES={done:'انجام شده',doing:'در حال انجام',hold:'معلق',none:'انجام نشده'};
 const STATUS_CLASS={done:'st-done',doing:'st-doing',hold:'st-hold',none:'st-none'};
 const CASH_STAGE_NAME='نشستن در حساب';
-const DEFAULT_STAGES=[
- {name:'تهیه و تنظیم صورت وضعیت',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'بررسی اولیه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'تهیه صورت وضعیت نسخه مکو',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'ارسال صورت وضعیت برای مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'صدور فاکتور پیمانکار',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'واحد تأمین مکو',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'تهیه صورت حساب و ارسال به تأمین',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'ارسال روکش نامه به مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'پرینت سه نسخه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'تحویل روکش نامه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'تهیه فرم های 7 گانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'تحویل نسخه نهایی به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:'پیگیری تا حصول نتیجه نهایی',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
- {name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'}
-];
-const DEFAULT_ADJUSTMENT_STAGES=[
-  {name:'دریافت نامه تعدیل',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
-  {name:'تهیه محاسبات تعدیل',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
-  {name:'ارائه به مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
-  {name:'دریافت امضا و تأیید',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
-  {name:'ارائه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+const COMMON_STAGES=[
+  {name:'تهیه و تنظیم {X}',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'بررسی اولیه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'تهیه {X} نسخه مکو',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'ارسال {X} برای مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'تهیه روکش و ثبت دبیرخانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'صدور فاکتور پیمانکار',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'واحد تأمین مکو',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'تهیه صورت حساب و ارسال به تأمین',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'ارسال روکش نامه به مشاور کارفرما',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'پرینت سه نسخه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'تحویل روکش نامه به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'تهیه فرم های 7 گانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'تحویل نسخه نهایی به کنترل ترافیک',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
+  {name:'پیگیری تا حصول نتیجه نهایی',resp:'',start:'',end:'',progress:0,status:'none',notes:''},
   {name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'}
+];
+function buildStages(xWord){
+  return COMMON_STAGES.map(s=>{
+    const c=JSON.parse(JSON.stringify(s));
+    c.name=c.name.replace(/\{X\}/g,xWord);
+    return c;
+  });
+}
+const DEFAULT_STAGES=buildStages('صورت وضعیت');
+const DEFAULT_ADJUSTMENT_STAGES=buildStages('تعدیل');
+
+/* ===== consultants default ===== */
+const DEFAULT_CONSULTANTS=[
+  {id:'meco',name:'مکو (داخلی)',prefix:'مک',color:'#7c3aed',desc:'قالب داخلی شرکت مکو برای صورت‌وضعیت‌ها و صورت‌حساب‌های دوره‌ای.',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,
+   letterHtml:`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;padding:40px 60px;line-height:2;color:#222}.head{display:flex;justify-content:space-between;border-bottom:3px solid #7c3aed;padding-bottom:12px;margin-bottom:20px}.head .name{font-weight:900;font-size:16pt;color:#7c3aed}.head .meta{font-size:9pt;color:#555;text-align:left;line-height:1.8}.title{text-align:center;font-size:14pt;font-weight:800;margin:30px 0 6px}.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:24px}p{text-align:justify;margin-bottom:10px}table{width:100%;border-collapse:collapse;font-size:10pt;margin:20px 0}th,td{border:1px solid #888;padding:6px 8px;text-align:right}th{background:#eee;font-weight:800}.sign{display:flex;justify-content:space-between;margin-top:60px;font-size:10pt}.sign div{border-top:1px solid #333;padding-top:8px;min-width:120px;text-align:center}.footer{margin-top:40px;font-size:8.5pt;color:#666;border-top:1px solid #bbb;padding-top:8px}</style></head><body><div class="head"><div class="name">{CONSULTANT}</div><div class="meta">شماره: {PREFIX}/0000<br>تاریخ: {DATE}</div></div><div class="title">صورت وضعیت پیشرفت کار</div><div class="subtitle">پروژه ایستگاه شارژ اتوبوس برقی — ایستگاه ................</div><p>احتراماً، به استحضار می‌رساند صورت وضعیت شماره ................. مربوط به دوره از تاریخ ................. لغایت ................. مطابق مستندات پیوست تنظیم و جهت بررسی و تأیید ارسال می‌گردد.</p><p>خواهشمند است پس از بررسی و اعمال نظر آن مجموعه، نتیجه را جهت اقدامات بعدی اعلام فرمایید.</p><table><thead><tr><th>#</th><th>شرح</th><th>مبلغ دوره (ریال)</th><th>مبلغ تعدیل (ریال)</th><th>جمع کل (ریال)</th></tr></thead><tbody><tr><td>۱</td><td>صورت وضعیت دوره</td><td>...............</td><td>...............</td><td>...............</td></tr><tr><td>۲</td><td>جمع تجمعی تا دوره</td><td>...............</td><td>...............</td><td>...............</td></tr></tbody></table><p>پیشاپیش از همکاری شما سپاسگزاریم.</p><div class="sign"><div>تهیه‌کننده</div><div>تأیید مشاور</div><div>تأیید کارفرما</div></div><div class="footer">این قالب نمونه توسط سامانه ردیاب صورت وضعیت مکو برای مشاور {CONSULTANT} تولید شده است.</div></body></html>`},
+  {id:'tarh',name:'مشاور طرح و توسعه',prefix:'طت',color:'#3aabba',desc:'قالب سرلوحه و جدول صورت‌وضعیت مشاور طرح و توسعه.',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,
+   letterHtml:`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;padding:40px 60px;line-height:2;color:#222}.head{display:flex;justify-content:space-between;border-bottom:3px solid #3aabba;padding-bottom:12px;margin-bottom:20px}.head .name{font-weight:900;font-size:16pt;color:#3aabba}.head .meta{font-size:9pt;color:#555;text-align:left;line-height:1.8}.title{text-align:center;font-size:14pt;font-weight:800;margin:30px 0 6px}.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:24px}p{text-align:justify;margin-bottom:10px}table{width:100%;border-collapse:collapse;font-size:10pt;margin:20px 0}th,td{border:1px solid #888;padding:6px 8px;text-align:right}th{background:#eee;font-weight:800}.sign{display:flex;justify-content:space-between;margin-top:60px;font-size:10pt}.sign div{border-top:1px solid #333;padding-top:8px;min-width:120px;text-align:center}.footer{margin-top:40px;font-size:8.5pt;color:#666;border-top:1px solid #bbb;padding-top:8px}</style></head><body><div class="head"><div class="name">{CONSULTANT}</div><div class="meta">شماره: {PREFIX}/0000<br>تاریخ: {DATE}</div></div><div class="title">صورت وضعیت پیشرفت کار</div><div class="subtitle">پروژه ایستگاه شارژ اتوبوس برقی — ایستگاه ................</div><p>احتراماً، به استحضار می‌رساند صورت وضعیت شماره ................. مربوط به دوره از تاریخ ................. لغایت ................. مطابق مستندات پیوست تنظیم و جهت بررسی و تأیید ارسال می‌گردد.</p><table><thead><tr><th>#</th><th>شرح</th><th>مبلغ دوره (ریال)</th><th>مبلغ تعدیل (ریال)</th><th>جمع کل (ریال)</th></tr></thead><tbody><tr><td>۱</td><td>صورت وضعیت دوره</td><td>...............</td><td>...............</td><td>...............</td></tr></tbody></table><div class="sign"><div>تهیه‌کننده</div><div>تأیید مشاور</div><div>تأیید کارفرما</div></div><div class="footer">این قالب نمونه توسط سامانه ردیاب صورت وضعیت مکو برای مشاور {CONSULTANT} تولید شده است.</div></body></html>`},
+  {id:'omran',name:'مشاور عمران پارس',prefix:'عپ',color:'#d4563f',desc:'قالب نامه و جدول تفصیلی مشاور عمران پارس.',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,
+   letterHtml:`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;padding:40px 60px;line-height:2;color:#222}.head{display:flex;justify-content:space-between;border-bottom:3px solid #d4563f;padding-bottom:12px;margin-bottom:20px}.head .name{font-weight:900;font-size:16pt;color:#d4563f}.head .meta{font-size:9pt;color:#555;text-align:left;line-height:1.8}.title{text-align:center;font-size:14pt;font-weight:800;margin:30px 0 6px}.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:24px}p{text-align:justify;margin-bottom:10px}table{width:100%;border-collapse:collapse;font-size:10pt;margin:20px 0}th,td{border:1px solid #888;padding:6px 8px;text-align:right}th{background:#eee;font-weight:800}.sign{display:flex;justify-content:space-between;margin-top:60px;font-size:10pt}.sign div{border-top:1px solid #333;padding-top:8px;min-width:120px;text-align:center}.footer{margin-top:40px;font-size:8.5pt;color:#666;border-top:1px solid #bbb;padding-top:8px}</style></head><body><div class="head"><div class="name">{CONSULTANT}</div><div class="meta">شماره: {PREFIX}/0000<br>تاریخ: {DATE}</div></div><div class="title">صورت وضعیت پیشرفت کار</div><div class="subtitle">پروژه ایستگاه شارژ اتوبوس برقی — ایستگاه ................</div><p>احتراماً، به استحضار می‌رساند صورت وضعیت شماره ................. مربوط به دوره از تاریخ ................. لغایت ................. مطابق مستندات پیوست تنظیم و جهت بررسی و تأیید ارسال می‌گردد.</p><div class="sign"><div>تهیه‌کننده</div><div>تأیید مشاور</div><div>تأیید کارفرما</div></div><div class="footer">این قالب نمونه توسط سامانه ردیاب صورت وضعیت مکو برای مشاور {CONSULTANT} تولید شده است.</div></body></html>`},
+  {id:'rah',name:'مشاور راه‌سازان',prefix:'رس',color:'#5db56f',desc:'قالب گزارش پیشرفت و صورت‌وضعیت مشاور راه‌سازان.',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,
+   letterHtml:`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;padding:40px 60px;line-height:2;color:#222}.head{display:flex;justify-content:space-between;border-bottom:3px solid #5db56f;padding-bottom:12px;margin-bottom:20px}.head .name{font-weight:900;font-size:16pt;color:#5db56f}.head .meta{font-size:9pt;color:#555;text-align:left;line-height:1.8}.title{text-align:center;font-size:14pt;font-weight:800;margin:30px 0 6px}.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:24px}p{text-align:justify;margin-bottom:10px}table{width:100%;border-collapse:collapse;font-size:10pt;margin:20px 0}th,td{border:1px solid #888;padding:6px 8px;text-align:right}th{background:#eee;font-weight:800}.sign{display:flex;justify-content:space-between;margin-top:60px;font-size:10pt}.sign div{border-top:1px solid #333;padding-top:8px;min-width:120px;text-align:center}.footer{margin-top:40px;font-size:8.5pt;color:#666;border-top:1px solid #bbb;padding-top:8px}</style></head><body><div class="head"><div class="name">{CONSULTANT}</div><div class="meta">شماره: {PREFIX}/0000<br>تاریخ: {DATE}</div></div><div class="title">صورت وضعیت پیشرفت کار</div><div class="subtitle">پروژه ایستگاه شارژ اتوبوس برقی — ایستگاه ................</div><p>احتراماً، به استحضار می‌رساند صورت وضعیت شماره ................. مربوط به دوره از تاریخ ................. لغایت ................. مطابق مستندات پیوست تنظیم و جهت بررسی و تأیید ارسال می‌گردد.</p><div class="sign"><div>تهیه‌کننده</div><div>تأیید مشاور</div><div>تأیید کارفرما</div></div><div class="footer">این قالب نمونه توسط سامانه ردیاب صورت وضعیت مکو برای مشاور {CONSULTANT} تولید شده است.</div></body></html>`},
+  {id:'poy',name:'مشاور پویا سازه',prefix:'پس',color:'#d79a3a',desc:'قالب نامه درخواست و جدول مالی مشاور پویا سازه.',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,
+   letterHtml:`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;padding:40px 60px;line-height:2;color:#222}.head{display:flex;justify-content:space-between;border-bottom:3px solid #d79a3a;padding-bottom:12px;margin-bottom:20px}.head .name{font-weight:900;font-size:16pt;color:#d79a3a}.head .meta{font-size:9pt;color:#555;text-align:left;line-height:1.8}.title{text-align:center;font-size:14pt;font-weight:800;margin:30px 0 6px}.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:24px}p{text-align:justify;margin-bottom:10px}table{width:100%;border-collapse:collapse;font-size:10pt;margin:20px 0}th,td{border:1px solid #888;padding:6px 8px;text-align:right}th{background:#eee;font-weight:800}.sign{display:flex;justify-content:space-between;margin-top:60px;font-size:10pt}.sign div{border-top:1px solid #333;padding-top:8px;min-width:120px;text-align:center}.footer{margin-top:40px;font-size:8.5pt;color:#666;border-top:1px solid #bbb;padding-top:8px}</style></head><body><div class="head"><div class="name">{CONSULTANT}</div><div class="meta">شماره: {PREFIX}/0000<br>تاریخ: {DATE}</div></div><div class="title">صورت وضعیت پیشرفت کار</div><div class="subtitle">پروژه ایستگاه شارژ اتوبوس برقی — ایستگاه ................</div><p>احتراماً، به استحضار می‌رساند صورت وضعیت شماره ................. مربوط به دوره از تاریخ ................. لغایت ................. مطابق مستندات پیوست تنظیم و جهت بررسی و تأیید ارسال می‌گردد.</p><div class="sign"><div>تهیه‌کننده</div><div>تأیید مشاور</div><div>تأیید کارفرما</div></div><div class="footer">این قالب نمونه توسط سامانه ردیاب صورت وضعیت مکو برای مشاور {CONSULTANT} تولید شده است.</div></body></html>`},
+  {id:'negin',name:'مشاور نگین آبان',prefix:'نگ',color:'#c25bb8',desc:'قالب رسمی نگین آبان برای تعدیل و صورت‌وضعیت.',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,
+   letterHtml:`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;padding:40px 60px;line-height:2;color:#222}.head{display:flex;justify-content:space-between;border-bottom:3px solid #c25bb8;padding-bottom:12px;margin-bottom:20px}.head .name{font-weight:900;font-size:16pt;color:#c25bb8}.head .meta{font-size:9pt;color:#555;text-align:left;line-height:1.8}.title{text-align:center;font-size:14pt;font-weight:800;margin:30px 0 6px}.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:24px}p{text-align:justify;margin-bottom:10px}table{width:100%;border-collapse:collapse;font-size:10pt;margin:20px 0}th,td{border:1px solid #888;padding:6px 8px;text-align:right}th{background:#eee;font-weight:800}.sign{display:flex;justify-content:space-between;margin-top:60px;font-size:10pt}.sign div{border-top:1px solid #333;padding-top:8px;min-width:120px;text-align:center}.footer{margin-top:40px;font-size:8.5pt;color:#666;border-top:1px solid #bbb;padding-top:8px}</style></head><body><div class="head"><div class="name">{CONSULTANT}</div><div class="meta">شماره: {PREFIX}/0000<br>تاریخ: {DATE}</div></div><div class="title">صورت وضعیت پیشرفت کار</div><div class="subtitle">پروژه ایستگاه شارژ اتوبوس برقی — ایستگاه ................</div><p>احتراماً، به استحضار می‌رساند صورت وضعیت شماره ................. مربوط به دوره از تاریخ ................. لغایت ................. مطابق مستندات پیوست تنظیم و جهت بررسی و تأیید ارسال می‌گردد.</p><div class="sign"><div>تهیه‌کننده</div><div>تأیید مشاور</div><div>تأیید کارفرما</div></div><div class="footer">این قالب نمونه توسط سامانه ردیاب صورت وضعیت مکو برای مشاور {CONSULTANT} تولید شده است.</div></body></html>`}
 ];
 
 /* ===== state ===== */
@@ -716,7 +857,7 @@ function undoLast(){
 }
 
 function exportDbForBackup(){
-  const out={version:6,lastModified:DB.lastModified||new Date().toISOString(),stations:[]};
+  const out={version:8,lastModified:DB.lastModified||new Date().toISOString(),stations:[],consultants:DB.consultants||[]};
   DB.stations.forEach(st=>{
     const arr=[];
     Object.keys(st.invoices||{}).forEach(k=>{
@@ -727,6 +868,9 @@ function exportDbForBackup(){
         periodFrom:inv.periodFrom||null,periodTo:inv.periodTo||null,
         netAmount:inv.netAmount!=null?inv.netAmount:null,
         adjAmount:inv.adjAmount!=null?inv.adjAmount:null,
+        contractorAmount:inv.contractorAmount!=null?inv.contractorAmount:null,
+        consultantAmount:inv.consultantAmount!=null?inv.consultantAmount:null,
+        employerAmount:inv.employerAmount!=null?inv.employerAmount:null,
         cumAmount:inv.cumAmount!=null?inv.cumAmount:null,
         cumManual:inv.cumManual?true:false,cumAuto:inv.cumAuto?true:false,
         stages:inv.stages||[]
@@ -751,6 +895,9 @@ function importDbFromBackup(d){
           periodFrom:item.periodFrom||undefined,periodTo:item.periodTo||undefined,
           netAmount:item.netAmount!=null?item.netAmount:undefined,
           adjAmount:item.adjAmount!=null?item.adjAmount:undefined,
+          contractorAmount:item.contractorAmount!=null?item.contractorAmount:undefined,
+          consultantAmount:item.consultantAmount!=null?item.consultantAmount:undefined,
+          employerAmount:item.employerAmount!=null?item.employerAmount:undefined,
           cumAmount:item.cumAmount!=null?item.cumAmount:undefined,
           cumManual:item.cumManual?true:undefined,cumAuto:item.cumAuto?true:undefined,
           stages:item.stages||[]};
@@ -768,7 +915,8 @@ function importDbFromBackup(d){
     }
     stations.push(ns);
   });
-  return {stations,lastModified:d.lastModified};
+  const consultants=Array.isArray(d.consultants)&&d.consultants.length?d.consultants:JSON.parse(JSON.stringify(DEFAULT_CONSULTANTS));
+  return {stations,lastModified:d.lastModified,consultants};
 }
 function migrateOldInvoices(st){
   if(!st||!st.invoices)return;
@@ -778,8 +926,23 @@ function migrateOldInvoices(st){
   keys.forEach(k=>{
     const inv=st.invoices[k];if(!inv)return;
     const type=inv.type||'normal';
-    const newKey=invKey(k,type);
-    if(!out[newKey]){inv.type=type;out[newKey]=inv;}
+    /* اگر کلید از قبل به شکل type:num است، فقط از num استفاده کن */
+    let num;
+    if(k.indexOf(':')>-1){
+      const parsed=parseKey(k);
+      num=parsed.num;
+      /* اگر num خودش هم دوباره دارای : بود، تا آخرین : جدا کن */
+      while(num.indexOf(':')>-1){
+        num=num.slice(num.indexOf(':')+1);
+      }
+    } else {
+      num=k;
+    }
+    const newKey=invKey(num,type);
+    if(!out[newKey]){
+      inv.type=type;
+      out[newKey]=inv;
+    }
   });
   st.invoices=out;
 }
@@ -794,6 +957,21 @@ function migrateCashStage(st){
     inv.stages.push(cashStage);
   });
 }
+function migrateRoofStage(st){
+  if(!st||!st.invoices)return;
+  const ROOF_NAME='تهیه روکش و ثبت دبیرخانه';
+  Object.keys(st.invoices).forEach(k=>{
+    const inv=st.invoices[k];
+    if(!inv||!Array.isArray(inv.stages))return;
+    const has=inv.stages.some(x=>x&&x.name&&x.name.trim()===ROOF_NAME);
+    if(has)return;
+    const roofStage={name:ROOF_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:''};
+    /* افزودن بعد از «ارسال {X} برای مشاور کارفرما» یا «ارسال تعدیل برای مشاور کارفرما» */
+    const idx=inv.stages.findIndex(x=>x&&x.name&&x.name.indexOf('ارسال')>-1&&x.name.indexOf('مشاور کارفرما')>-1);
+    if(idx>=0)inv.stages.splice(idx+1,0,roofStage);
+    else inv.stages.splice(Math.min(4,inv.stages.length),0,roofStage);
+  });
+}
 function load(){
   try{DB=JSON.parse(localStorage.getItem('mokho_db'))}catch(e){DB=null}
   if(!DB||!DB.stations||!DB.stations.length) DB={stations:[
@@ -803,7 +981,11 @@ function load(){
     {id:uid(),name:'کیانشهر',invoices:{}},
     {id:uid(),name:'فردیس',invoices:{}}
   ]};
+  if(!DB.consultants||!Array.isArray(DB.consultants)||!DB.consultants.length){
+    DB.consultants=JSON.parse(JSON.stringify(DEFAULT_CONSULTANTS));
+  }
   DB.stations.forEach(st=>migrateOldInvoices(st));
+  DB.stations.forEach(st=>migrateRoofStage(st));
   DB.stations.forEach(st=>migrateCashStage(st));
   computeAllCumulative();
   cur.st=DB.stations[0].id;
@@ -923,9 +1105,10 @@ function renderTopbar(){
   if(!cur.inv&&keys.length)cur.inv=keys[0];
   sel.innerHTML=keys.map(k=>{
     const _invObj=s.invoices[k];
-    const _invType=_invObj&&_invObj.type==='adjustment'?'تعدیل':'صورت وضعیت';
+    const _isAdj=_invObj&&_invObj.type==='adjustment';
+    const _icon=_isAdj?'⚖️':'📄';
     const p=parseKey(k);
-    const _label=(_invObj&&_invObj.label)?_invObj.label:(_invType+' '+p.num);
+    const _label=(_invObj&&_invObj.label)?_invObj.label:(_icon+' '+p.num);
     return `<option value="${k}" ${k===cur.inv?'selected':''}>${_label}</option>`;
   }).join('')||'<option value="">—</option>';
 }
@@ -946,6 +1129,9 @@ function renderInfoStrip(){
   const net=inv.netAmount!=null&&inv.netAmount!==''?fmtMoney(inv.netAmount):'—';
   const adj=inv.adjAmount!=null&&inv.adjAmount!==''?fmtMoney(inv.adjAmount):'—';
   const cum=inv.cumAmount!=null&&inv.cumAmount!==''?fmtMoney(inv.cumAmount):'—';
+  const ctr=inv.contractorAmount!=null&&inv.contractorAmount!==''?fmtMoney(inv.contractorAmount):'—';
+  const cst=inv.consultantAmount!=null&&inv.consultantAmount!==''?fmtMoney(inv.consultantAmount):'—';
+  const emp=inv.employerAmount!=null&&inv.employerAmount!==''?fmtMoney(inv.employerAmount):'—';
   let html='';
   html+=`<div class="info-cell"><div class="lbl">دوره — از</div><div class="val fa">${from}</div></div>`;
   html+=`<div class="info-cell"><div class="lbl">دوره — تا</div><div class="val fa">${to}</div></div>`;
@@ -956,6 +1142,9 @@ function renderInfoStrip(){
   }
   const cumTag=inv.cumAuto?'<span class="auto-tag" style="display:inline-block;background:oklch(93% 0.06 155);color:oklch(42% 0.12 155);border-radius:8px;font-size:.62rem;padding:1px 5px;margin-inline-start:4px;font-weight:700">خودکار</span>':'';
   html+=`<div class="info-cell"><div class="lbl">مبلغ تجمعی (ریال)${cumTag}</div><div class="val">${cum}</div></div>`;
+  if(inv.contractorAmount!=null&&inv.contractorAmount!=='')html+=`<div class="info-cell contractor"><div class="lbl">اعلامی پیمانکار (ریال)</div><div class="val">${ctr}</div></div>`;
+  if(inv.consultantAmount!=null&&inv.consultantAmount!=='')html+=`<div class="info-cell consultant"><div class="lbl">تاییدی مشاور (ریال)</div><div class="val">${cst}</div></div>`;
+  if(inv.employerAmount!=null&&inv.employerAmount!=='')html+=`<div class="info-cell employer"><div class="lbl">تاییدی کارفرما (ریال)</div><div class="val">${emp}</div></div>`;
   el.innerHTML=html;
 }
 function renderSummary(){
@@ -1250,7 +1439,6 @@ function openStageModal(idx){
   const nameEl=document.getElementById('f_name');if(nameEl)nameEl.focus();
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('show');window.__stageStartPicker=null;window.__stageEndPicker=null;}
-/* غیرفعال شد: بستن مودال مرحله با کلیک پس‌زمینه */
 function saveStage(idx){
   const inv=curInvoice();if(!inv)return;
   pushUndo();
@@ -1366,6 +1554,9 @@ function openAddInv(){
   document.getElementById('addInvNet').value='';
   document.getElementById('addInvAdjAmt').value='';
   document.getElementById('addInvCum').value='';
+  document.getElementById('addInvContractor').value='';
+  document.getElementById('addInvConsultant').value='';
+  document.getElementById('addInvEmployer').value='';
   document.getElementById('typeNormal').classList.add('selected');
   document.getElementById('typeAdj').classList.remove('selected');
   pickerFrom=buildJalaliPicker('periodFromWrap','',function(){});
@@ -1385,6 +1576,9 @@ function openEditInvoiceMeta(){
   document.getElementById('addInvNet').value=inv.netAmount!=null?String(inv.netAmount):'';
   document.getElementById('addInvAdjAmt').value=inv.adjAmount!=null?String(inv.adjAmount):'';
   document.getElementById('addInvCum').value=inv.cumManual&&inv.cumAmount!=null?String(inv.cumAmount):'';
+  document.getElementById('addInvContractor').value=inv.contractorAmount!=null?String(inv.contractorAmount):'';
+  document.getElementById('addInvConsultant').value=inv.consultantAmount!=null?String(inv.consultantAmount):'';
+  document.getElementById('addInvEmployer').value=inv.employerAmount!=null?String(inv.employerAmount):'';
   document.getElementById('typeNormal').classList.toggle('selected',!isAdjType());
   document.getElementById('typeAdj').classList.toggle('selected',isAdjType());
   document.getElementById('typeNormal').style.pointerEvents='none';
@@ -1401,7 +1595,6 @@ function closeAddInv(){
   document.getElementById('typeAdj').style.pointerEvents='';
   pickerFrom=null;pickerTo=null;
 }
-/* غیرفعال شد: بستن مودال صورت‌وضعیت با کلیک پس‌زمینه */
 document.getElementById('typeNormal').onclick=()=>{
   if(ADD_INV_MODE==='edit')return;
   ADD_INV_TYPE='normal';
@@ -1429,6 +1622,9 @@ function confirmAddInv(){
   const adjAmt=parseMoney(document.getElementById('addInvAdjAmt').value);
   const cumRaw=document.getElementById('addInvCum').value;
   const cum=parseMoney(cumRaw);
+  const ctr=parseMoney(document.getElementById('addInvContractor').value);
+  const cst=parseMoney(document.getElementById('addInvConsultant').value);
+  const emp=parseMoney(document.getElementById('addInvEmployer').value);
   if(!adj&&net==null){alert('مبلغ صورت وضعیت خالص دوره را وارد کنید.');return;}
   if(adj&&adjAmt==null){alert('مبلغ تعدیل دوره را وارد کنید.');return;}
   if(ADD_INV_MODE==='create'){
@@ -1442,6 +1638,7 @@ function confirmAddInv(){
     if(adj){if(adjAmt!=null)inv.adjAmount=adjAmt;}else{if(net!=null)inv.netAmount=net;}
     if(cumRaw!=null&&String(cumRaw).trim()!==''){inv.cumAmount=cum!=null?cum:null;inv.cumManual=true;inv.cumAuto=false;}
     else{inv.cumManual=false;inv.cumAuto=true;}
+    inv.contractorAmount=ctr;inv.consultantAmount=cst;inv.employerAmount=emp;
     if(String(name)!==String(+name))inv.label=name;
     cur.inv=key;
   }else{
@@ -1452,12 +1649,13 @@ function confirmAddInv(){
     else{if(net!=null)inv.netAmount=net;else delete inv.netAmount;}
     if(cumRaw!=null&&String(cumRaw).trim()!==''){inv.cumAmount=cum!=null?cum:null;inv.cumManual=true;inv.cumAuto=false;}
     else{inv.cumManual=false;inv.cumAuto=true;}
+    inv.contractorAmount=ctr;inv.consultantAmount=cst;inv.employerAmount=emp;
   }
   closeAddInv();renderAll();
 }
 document.getElementById('addInvName').addEventListener('input',refreshCumHint);
 document.getElementById('addInvNet').addEventListener('input',refreshCumHint);
-['addInvNet','addInvAdjAmt','addInvCum'].forEach(id=>{
+['addInvNet','addInvAdjAmt','addInvCum','addInvContractor','addInvConsultant','addInvEmployer'].forEach(id=>{
   const el=document.getElementById(id);if(!el)return;
   el.addEventListener('blur',()=>{const n=parseMoney(el.value);if(n!=null)el.value=n.toLocaleString('en-US');});
   el.addEventListener('focus',()=>{const n=parseMoney(el.value);if(n!=null)el.value=String(n);});
@@ -1492,6 +1690,9 @@ document.getElementById('toggleTypeBtn').onclick=()=>{
   if(inv.cumAmount!=null)s.invoices[newKey].cumAmount=inv.cumAmount;
   if(inv.cumManual)s.invoices[newKey].cumManual=true;
   if(inv.cumAuto)s.invoices[newKey].cumAuto=true;
+  if(inv.contractorAmount!=null)s.invoices[newKey].contractorAmount=inv.contractorAmount;
+  if(inv.consultantAmount!=null)s.invoices[newKey].consultantAmount=inv.consultantAmount;
+  if(inv.employerAmount!=null)s.invoices[newKey].employerAmount=inv.employerAmount;
   if(newType==='adjustment'){if(inv.adjAmount!=null)s.invoices[newKey].adjAmount=inv.adjAmount;}
   else{if(inv.netAmount!=null)s.invoices[newKey].netAmount=inv.netAmount;}
   cur.inv=newKey;renderAll();
@@ -1515,7 +1716,7 @@ function backupJSON(){
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='mokho_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  a.download='meco_backup_'+new Date().toISOString().slice(0,10)+'.json';
   a.click();URL.revokeObjectURL(a.href);
 }
 function restoreJSON(input){
@@ -1528,6 +1729,7 @@ function restoreJSON(input){
       if(!confirm('بازیابی پشتیبان، داده‌های فعلی را جایگزین می‌کند. ادامه؟'))return;
       pushUndo();
       DB=importDbFromBackup(d);
+      DB.stations.forEach(st=>migrateRoofStage(st));
       DB.stations.forEach(st=>migrateCashStage(st));
       computeAllCumulative();
       cur.st=DB.stations[0]?DB.stations[0].id:null;cur.inv=null;
@@ -1562,9 +1764,16 @@ function printReport(){
   setTimeout(()=>{window.print();pa.style.display='none';},600);
 }
 
-function buildReportRows(stationFilter,typeFilter){
-  const stations=stationFilter==='__ALL__'?DB.stations:DB.stations.filter(s=>s.id===stationFilter);
+/* ===== گزارش مبالغ ===== */
+function buildReportRows(stationFilter,typeFilter,opts){
+  opts=opts||{};
+  const overheadPct=opts.overhead? (+opts.overheadPct||0) : 0;
+  const vatPct=opts.vat? (+opts.vatPct||0) : 0;
+  const showApproved=!!opts.showApproved;
+  const stations=(stationFilter==='__ALL__'||!stationFilter)?DB.stations:DB.stations.filter(s=>s.id===stationFilter);
   const rows=[];let totalNet=0,totalAdj=0;let lastCum=0;
+  let totalOverhead=0,totalVat=0,totalFinal=0;
+  let totalContractor=0,totalConsultant=0,totalEmployer=0;
   stations.forEach(st=>{
     computeCumulativeForStation(st);
     const keys=Object.keys(st.invoices||{}).sort((a,b)=>{
@@ -1581,65 +1790,176 @@ function buildReportRows(stationFilter,typeFilter){
     });
     if(!filtered.length)return;
     let sumNet=0,sumAdj=0,lastCumInStation=null;
+    let sumOverhead=0,sumVat=0,sumFinal=0;
+    let sumContractor=0,sumConsultant=0,sumEmployer=0;
     filtered.forEach(k=>{
       const inv=st.invoices[k],p=parseKey(k),t=inv.type||'normal';
       const label=inv.label||((t==='adjustment'?'تعدیل':'صورت وضعیت')+' '+p.num);
       const isAuto=inv.cumAuto&&!inv.cumManual;
+      const baseAmt=t==='adjustment'?(+inv.adjAmount||0):(+inv.netAmount||0);
+      const overheadAmt=baseAmt*(overheadPct/100);
+      const afterOverhead=baseAmt+overheadAmt;
+      const vatAmt=afterOverhead*(vatPct/100);
+      const finalAmt=afterOverhead+vatAmt;
       rows.push({station:st.name,label,t,num:p.num,
         fromRaw:inv.periodFrom,toRaw:inv.periodTo,
         net:inv.netAmount!=null?fmtMoney(inv.netAmount):'—',
         adj:inv.adjAmount!=null?fmtMoney(inv.adjAmount):'—',
         cum:inv.cumAmount!=null?fmtMoney(inv.cumAmount):'—',
-        netRaw:inv.netAmount,adjRaw:inv.adjAmount,cumRaw:inv.cumAmount,isAuto});
+        netRaw:inv.netAmount,adjRaw:inv.adjAmount,cumRaw:inv.cumAmount,isAuto,
+        baseAmt,overheadAmt,afterOverhead,vatAmt,finalAmt,
+        overheadAmtStr:fmtMoney(overheadAmt),
+        afterOverheadStr:fmtMoney(afterOverhead),
+        vatAmtStr:fmtMoney(vatAmt),
+        finalAmtStr:fmtMoney(finalAmt),
+        contractor:inv.contractorAmount!=null?fmtMoney(inv.contractorAmount):'—',
+        consultant:inv.consultantAmount!=null?fmtMoney(inv.consultantAmount):'—',
+        employer:inv.employerAmount!=null?fmtMoney(inv.employerAmount):'—',
+        contractorRaw:inv.contractorAmount,consultantRaw:inv.consultantAmount,employerRaw:inv.employerAmount
+      });
       if(inv.netAmount!=null)sumNet+=+inv.netAmount;
       if(inv.adjAmount!=null)sumAdj+=+inv.adjAmount;
       if(inv.cumAmount!=null)lastCumInStation=+inv.cumAmount;
+      sumOverhead+=overheadAmt;
+      sumVat+=vatAmt;
+      sumFinal+=finalAmt;
+      if(inv.contractorAmount!=null)sumContractor+=+inv.contractorAmount;
+      if(inv.consultantAmount!=null)sumConsultant+=+inv.consultantAmount;
+      if(inv.employerAmount!=null)sumEmployer+=+inv.employerAmount;
     });
     rows.push({subtotal:true,station:st.name,label:'جمع ایستگاه: '+st.name,
       net:fmtMoney(sumNet),adj:fmtMoney(sumAdj),cum:(lastCumInStation!=null?fmtMoney(lastCumInStation):'—'),
-      netRaw:sumNet,adjRaw:sumAdj,cumRaw:lastCumInStation});
+      netRaw:sumNet,adjRaw:sumAdj,cumRaw:lastCumInStation,
+      overheadAmtStr:fmtMoney(sumOverhead),afterOverheadStr:fmtMoney(sumNet+sumAdj+sumOverhead),
+      vatAmtStr:fmtMoney(sumVat),finalAmtStr:fmtMoney(sumNet+sumAdj+sumOverhead+sumVat),
+      contractor:fmtMoney(sumContractor),consultant:fmtMoney(sumConsultant),employer:fmtMoney(sumEmployer),
+      contractorRaw:sumContractor,consultantRaw:sumConsultant,employerRaw:sumEmployer
+    });
     totalNet+=sumNet;totalAdj+=sumAdj;
+    totalOverhead+=sumOverhead;totalVat+=sumVat;totalFinal+=sumFinal;
+    totalContractor+=sumContractor;totalConsultant+=sumConsultant;totalEmployer+=sumEmployer;
     if(lastCumInStation!=null)lastCum=lastCumInStation;
   });
-  return {rows,totalNet,totalAdj,totalCum:lastCum,stations};
+  return {rows,totalNet,totalAdj,totalCum:lastCum,stations,
+    totalOverhead,totalVat,totalFinal,totalContractor,totalConsultant,totalEmployer,
+    overheadPct,vatPct,showApproved,overhead:!!opts.overhead,vat:!!opts.vat};
+}
+function getReportOpts(){
+  return {
+    showApproved:!!document.getElementById('chkApproved').checked,
+    overhead:!!document.getElementById('chkOverhead').checked,
+    overheadPct:parseFloat(document.getElementById('overheadPct').value)||0,
+    vat:!!document.getElementById('chkVat').checked,
+    vatPct:parseFloat(document.getElementById('vatPct').value)||0
+  };
 }
 function renderReport(){
   const stationSel=document.getElementById('reportStationSel');
   const typeSel=document.getElementById('reportTypeSel');
   const wrap=document.getElementById('reportTableWrap');
-  const {rows,totalNet,totalAdj,totalCum}=buildReportRows(stationSel.value,typeSel.value);
-  if(!rows.length){wrap.innerHTML='<p style="text-align:center;color:var(--muted);padding:20px">داده‌ای برای نمایش وجود ندارد.</p>';return;}
-  let html='<table class="rep-tbl"><thead><tr>'+
-    '<th>نام ایستگاه</th><th>نوع</th><th>شماره</th><th>از تاریخ</th><th>تا تاریخ</th><th>مبلغ دوره (ریال)</th><th>مبلغ تعدیل (ریال)</th><th>مبلغ تجمعی (ریال)</th>'+
-    '</tr></thead><tbody>';
+  const opts=getReportOpts();
+  const R=buildReportRows(stationSel.value,typeSel.value,opts);
+  const rows=R.rows;
+  const showApproved=R.showApproved;
+  const overhead=R.overhead;
+  const vat=R.vat;
+  const overheadPct=R.overheadPct;
+  const vatPct=R.vatPct;
+  if(!rows.length){
+    wrap.innerHTML='<p style="text-align:center;color:var(--muted);padding:20px">داده‌ای برای نمایش وجود ندارد.</p>';
+    return;
+  }
+  let html='<table class="rep-tbl"><thead><tr>';
+  html+='<th>نام ایستگاه</th><th>نوع</th><th>شماره</th><th>از تاریخ</th><th>تا تاریخ</th>';
+  html+='<th>مبلغ دوره (ریال)</th><th>مبلغ تعدیل (ریال)</th>';
+  if(showApproved){
+    html+='<th style="background:oklch(55% 0.13 250)">اعلامی پیمانکار</th>';
+    html+='<th style="background:oklch(55% 0.13 300)">تاییدی مشاور</th>';
+    html+='<th style="background:oklch(50% 0.13 150)">تاییدی کارفرما</th>';
+  }
+  html+='<th>مبلغ تجمعی (ریال)</th>';
+  if(overhead){
+    html+=`<th class="overhead">بالاسری ٪${overheadPct}</th>`;
+    html+=`<th class="overhead">با احتساب بالاسری</th>`;
+  }
+  if(vat){
+    html+=`<th class="vat">ارزش افزوده ٪${vatPct}</th>`;
+    html+=`<th class="totalcol">جمع کل با ارزش افزوده</th>`;
+  }
+  html+='</tr></thead><tbody>';
+
   rows.forEach(r=>{
     if(r.subtotal){
-      html+=`<tr style="background:oklch(96% 0.02 60);font-weight:800;color:oklch(45% 0.1 60)">
-        <td>${esc(r.station)}</td><td colspan="2">${esc(r.label)}</td>
-        <td></td><td></td>
-        <td class="num">${r.net}</td><td class="num">${r.adj}</td><td class="num">${r.cum}</td></tr>`;
+      html+=`<tr style="background:oklch(96% 0.02 60);font-weight:800;color:oklch(45% 0.1 60)">`;
+      html+=`<td>${esc(r.station)}</td>`;
+      html+=`<td colspan="2">${esc(r.label)}</td>`;
+      html+=`<td></td><td></td>`;
+      html+=`<td class="num">${r.net}</td>`;
+      html+=`<td class="num">${r.adj}</td>`;
+      if(showApproved){
+        html+=`<td class="num">${r.contractor}</td>`;
+        html+=`<td class="num">${r.consultant}</td>`;
+        html+=`<td class="num">${r.employer}</td>`;
+      }
+      html+=`<td class="num">${r.cum}</td>`;
+      if(overhead){
+        html+=`<td class="num overhead-cell">${r.overheadAmtStr}</td>`;
+        html+=`<td class="num overhead-cell">${r.afterOverheadStr}</td>`;
+      }
+      if(vat){
+        html+=`<td class="num vat-cell">${r.vatAmtStr}</td>`;
+        html+=`<td class="num total-cell">${r.finalAmtStr}</td>`;
+      }
+      html+=`</tr>`;
       return;
     }
     const typeFa=r.t==='adjustment'?'تعدیل':'صورت وضعیت';
     const badgeCls=r.t==='adjustment'?'adj':'normal';
     const autoTag=r.isAuto?'<span class="auto-tag">خودکار</span>':'';
-    html+=`<tr>
-      <td>${esc(r.station)}</td>
-      <td><span class="type-badge ${badgeCls}">${typeFa}</span></td>
-      <td>${esc(r.num)}</td>
-      <td style="direction:rtl">${jalaliFmt(r.fromRaw)}</td>
-      <td style="direction:rtl">${jalaliFmt(r.toRaw)}</td>
-      <td class="num">${r.net}</td>
-      <td class="num">${r.adj}</td>
-      <td class="num">${r.cum}${autoTag}</td>
-    </tr>`;
+    html+=`<tr>`;
+    html+=`<td>${esc(r.station)}</td>`;
+    html+=`<td><span class="type-badge ${badgeCls}">${typeFa}</span></td>`;
+    html+=`<td>${esc(r.num)}</td>`;
+    html+=`<td style="direction:rtl">${jalaliFmt(r.fromRaw)}</td>`;
+    html+=`<td style="direction:rtl">${jalaliFmt(r.toRaw)}</td>`;
+    html+=`<td class="num">${r.net}</td>`;
+    html+=`<td class="num">${r.adj}</td>`;
+    if(showApproved){
+      html+=`<td class="num approved">${r.contractor}</td>`;
+      html+=`<td class="num approved">${r.consultant}</td>`;
+      html+=`<td class="num approved">${r.employer}</td>`;
+    }
+    html+=`<td class="num">${r.cum}${autoTag}</td>`;
+    if(overhead){
+      html+=`<td class="num overhead-cell">${r.overheadAmtStr}</td>`;
+      html+=`<td class="num overhead-cell">${r.afterOverheadStr}</td>`;
+    }
+    if(vat){
+      html+=`<td class="num vat-cell">${r.vatAmtStr}</td>`;
+      html+=`<td class="num total-cell">${r.finalAmtStr}</td>`;
+    }
+    html+=`</tr>`;
   });
-  html+=`<tr class="total">
-    <td colspan="5">جمع کل</td>
-    <td class="num">${fmtMoney(totalNet)}</td>
-    <td class="num">${fmtMoney(totalAdj)}</td>
-    <td class="num">${fmtMoney(totalCum)}</td>
-  </tr>`;
+
+  html+=`<tr class="total-row">`;
+  html+=`<td colspan="5">جمع کل</td>`;
+  html+=`<td class="num">${fmtMoney(R.totalNet)}</td>`;
+  html+=`<td class="num">${fmtMoney(R.totalAdj)}</td>`;
+  if(showApproved){
+    html+=`<td class="num">${fmtMoney(R.totalContractor)}</td>`;
+    html+=`<td class="num">${fmtMoney(R.totalConsultant)}</td>`;
+    html+=`<td class="num">${fmtMoney(R.totalEmployer)}</td>`;
+  }
+  html+=`<td class="num">${fmtMoney(R.totalCum)}</td>`;
+  if(overhead){
+    html+=`<td class="num">${fmtMoney(R.totalOverhead)}</td>`;
+    html+=`<td class="num">${fmtMoney(R.totalNet+R.totalAdj+R.totalOverhead)}</td>`;
+  }
+  if(vat){
+    html+=`<td class="num">${fmtMoney(R.totalVat)}</td>`;
+    html+=`<td class="num">${fmtMoney(R.totalFinal)}</td>`;
+  }
+  html+=`</tr>`;
   html+='</tbody></table>';
   wrap.innerHTML=html;
 }
@@ -1651,17 +1971,23 @@ function openReport(){
   document.getElementById('reportOverlay').classList.add('show');
 }
 function closeReport(){document.getElementById('reportOverlay').classList.remove('show');}
-/* غیرفعال شد: بستن مودال گزارش با کلیک پس‌زمینه */
 document.getElementById('reportStationSel').onchange=renderReport;
 document.getElementById('reportTypeSel').onchange=renderReport;
+document.getElementById('chkApproved').onchange=renderReport;
+document.getElementById('chkOverhead').onchange=renderReport;
+document.getElementById('chkVat').onchange=renderReport;
+document.getElementById('overheadPct').oninput=renderReport;
+document.getElementById('vatPct').oninput=renderReport;
 
 function exportReportToExcel(){
   if(typeof XLSX==='undefined'){alert('کتابخانه SheetJS بارگذاری نشده است.');return;}
   const stationFilter=document.getElementById('reportStationSel').value;
   const typeFilter=document.getElementById('reportTypeSel').value;
-  const {rows,totalNet,totalAdj,totalCum,stations}=buildReportRows(stationFilter,typeFilter);
+  const opts=getReportOpts();
+  const R=buildReportRows(stationFilter,typeFilter,opts);
+  const {rows,totalNet,totalAdj,totalCum,totalOverhead,totalVat,totalFinal,showApproved,overhead,vat,overheadPct,vatPct,stations}=R;
   if(!rows.length){alert('داده‌ای برای خروجی وجود ندارد.');return;}
-  const filterTxt=stationFilter==='__ALL__'?'همه ایستگاه‌ها':(stations[0]?stations[0].name:'—');
+  const filterTxt=(stationFilter==='__ALL__'||!stationFilter)?'همه ایستگاه‌ها':(stations[0]?stations[0].name:'—');
   const typeTxt=typeFilter==='all'?'همه':(typeFilter==='normal'?'فقط صورت وضعیت':'فقط تعدیل');
   const wb=XLSX.utils.book_new();
 
@@ -1669,85 +1995,151 @@ function exportReportToExcel(){
   dataReport.push(['ردیاب صورت وضعیت مکو — گزارش مبالغ']);
   dataReport.push(['ایستگاه: '+filterTxt,'نوع: '+typeTxt]);
   dataReport.push([]);
-  dataReport.push(['نام ایستگاه','نوع','شماره','از تاریخ','تا تاریخ','مبلغ دوره (ریال)','مبلغ تعدیل (ریال)','مبلغ تجمعی (ریال)']);
+  const headRow=['نام ایستگاه','نوع','شماره','از تاریخ','تا تاریخ','مبلغ دوره (ریال)','مبلغ تعدیل (ریال)'];
+  if(showApproved)headRow.push('اعلامی پیمانکار','تاییدی مشاور','تاییدی کارفرما');
+  headRow.push('مبلغ تجمعی (ریال)');
+  if(overhead)headRow.push('بالاسری ٪'+overheadPct,'با احتساب بالاسری');
+  if(vat)headRow.push('ارزش افزوده ٪'+vatPct,'جمع کل با ارزش افزوده');
+  dataReport.push(headRow);
   rows.forEach(r=>{
     if(r.subtotal){
-      dataReport.push([r.station,'جمع ایستگاه','','','', r.netRaw||0, r.adjRaw||0, r.cumRaw||0]);
+      const row=[r.station,'جمع ایستگاه','','','', r.netRaw||0, r.adjRaw||0];
+      if(showApproved)row.push(r.contractorRaw||0,r.consultantRaw||0,r.employerRaw||0);
+      row.push(r.cumRaw||0);
+      if(overhead){row.push((r.overheadAmtStr||'').toString().replace(/,/g,'')*1||0,(r.afterOverheadStr||'').toString().replace(/,/g,'')*1||0);}
+      if(vat){row.push((r.vatAmtStr||'').toString().replace(/,/g,'')*1||0,(r.finalAmtStr||'').toString().replace(/,/g,'')*1||0);}
+      dataReport.push(row);
       return;
     }
     const typeFa=r.t==='adjustment'?'تعدیل':'صورت وضعیت';
-    dataReport.push([
-      r.station,typeFa,r.num||'',
-      r.fromRaw||'',r.toRaw||'',
-      r.netRaw!=null?+r.netRaw:'',
-      r.adjRaw!=null?+r.adjRaw:'',
-      r.cumRaw!=null?+r.cumRaw:''
-    ]);
+    const row=[r.station,typeFa,r.num||'',r.fromRaw||'',r.toRaw||'',
+      r.netRaw!=null?+r.netRaw:'', r.adjRaw!=null?+r.adjRaw:''];
+    if(showApproved)row.push(r.contractorRaw!=null?+r.contractorRaw:'',r.consultantRaw!=null?+r.consultantRaw:'',r.employerRaw!=null?+r.employerRaw:'');
+    row.push(r.cumRaw!=null?+r.cumRaw:'');
+    if(overhead){row.push(+r.overheadAmt||0,+r.afterOverhead||0);}
+    if(vat){row.push(+r.vatAmt||0,+r.finalAmt||0);}
+    dataReport.push(row);
   });
   dataReport.push([]);
-  dataReport.push(['جمع کل','','','','',totalNet,totalAdj,totalCum]);
+  const totalRow=['جمع کل','','','','',totalNet,totalAdj];
+  if(showApproved)totalRow.push(R.totalContractor,R.totalConsultant,R.totalEmployer);
+  totalRow.push(totalCum);
+  if(overhead)totalRow.push(totalOverhead,totalNet+totalAdj+totalOverhead);
+  if(vat)totalRow.push(totalVat,totalFinal);
+  dataReport.push(totalRow);
   const wsReport=XLSX.utils.aoa_to_sheet(dataReport);
-  wsReport['!cols']=[{wch:18},{wch:14},{wch:10},{wch:14},{wch:14},{wch:20},{wch:20},{wch:20}];
+  const colsW=[{wch:18},{wch:14},{wch:10},{wch:14},{wch:14},{wch:20},{wch:20}];
+  if(showApproved)colsW.push({wch:20},{wch:20},{wch:20});
+  colsW.push({wch:20});
+  if(overhead)colsW.push({wch:18},{wch:20});
+  if(vat)colsW.push({wch:18},{wch:22});
+  wsReport['!cols']=colsW;
   wsReport['!views']=[{RTL:true}];
   XLSX.utils.book_append_sheet(wb,wsReport,'Report');
-
-  const dataChart=[];
-  dataChart.push(['نام ایستگاه','مبلغ دوره (ریال)','مبلغ تعدیل (ریال)','مبلغ تجمعی (ریال)']);
-  rows.forEach(r=>{
-    if(r.subtotal)return;
-    dataChart.push([
-      r.station,
-      r.netRaw!=null?+r.netRaw:0,
-      r.adjRaw!=null?+r.adjRaw:0,
-      r.cumRaw!=null?+r.cumRaw:0
-    ]);
-  });
-  const wsChart=XLSX.utils.aoa_to_sheet(dataChart);
-  wsChart['!cols']=[{wch:18},{wch:20},{wch:20},{wch:20}];
-  wsChart['!views']=[{RTL:true}];
-  XLSX.utils.book_append_sheet(wb,wsChart,'ChartData');
 
   const dataKPI=[];
   dataKPI.push(['شاخص','مقدار']);
   dataKPI.push(['تعداد ردیف‌های آیتم', rows.filter(r=>!r.subtotal).length]);
   dataKPI.push(['جمع مبلغ دوره (ریال)', totalNet]);
   dataKPI.push(['جمع مبلغ تعدیل (ریال)', totalAdj]);
+  if(showApproved){
+    dataKPI.push(['جمع اعلامی پیمانکار', R.totalContractor]);
+    dataKPI.push(['جمع تاییدی مشاور', R.totalConsultant]);
+    dataKPI.push(['جمع تاییدی کارفرما', R.totalEmployer]);
+  }
   dataKPI.push(['آخرین مبلغ تجمعی (ریال)', totalCum]);
+  if(overhead){
+    dataKPI.push(['درصد بالاسری', overheadPct+'%']);
+    dataKPI.push(['جمع بالاسری (ریال)', totalOverhead]);
+    dataKPI.push(['جمع با احتساب بالاسری', totalNet+totalAdj+totalOverhead]);
+  }
+  if(vat){
+    dataKPI.push(['درصد ارزش افزوده', vatPct+'%']);
+    dataKPI.push(['جمع ارزش افزوده (ریال)', totalVat]);
+    dataKPI.push(['جمع کل با ارزش افزوده', totalFinal]);
+  }
   dataKPI.push(['تاریخ گزارش', new Date().toLocaleDateString('fa-IR')]);
   const wsKPI=XLSX.utils.aoa_to_sheet(dataKPI);
   wsKPI['!cols']=[{wch:30},{wch:24}];
   wsKPI['!views']=[{RTL:true}];
   XLSX.utils.book_append_sheet(wb,wsKPI,'KPI');
 
-  XLSX.writeFile(wb,'mokho_report_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  XLSX.writeFile(wb,'meco_report_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 function printReportModal(){
   const stationFilter=document.getElementById('reportStationSel').value;
   const typeFilter=document.getElementById('reportTypeSel').value;
-  const {rows,totalNet,totalAdj,totalCum,stations}=buildReportRows(stationFilter,typeFilter);
+  const opts=getReportOpts();
+  const R=buildReportRows(stationFilter,typeFilter,opts);
+  const {rows,totalNet,totalAdj,totalCum,totalOverhead,totalVat,totalFinal,showApproved,overhead,vat,overheadPct,vatPct,stations}=R;
   if(!rows.length)return alert('داده‌ای برای چاپ وجود ندارد.');
   const pa=document.getElementById('printArea');
-  const filterTxt=stationFilter==='__ALL__'?'همه ایستگاه‌ها':(stations[0]?stations[0].name:'—');
+  const filterTxt=(stationFilter==='__ALL__'||!stationFilter)?'همه ایستگاه‌ها':(stations[0]?stations[0].name:'—');
   let body='';
+  let colsCount=7;
+  if(showApproved)colsCount+=3;
+  colsCount+=1;
+  if(overhead)colsCount+=2;
+  if(vat)colsCount+=2;
   rows.forEach(r=>{
-    if(r.subtotal){body+=`<tr style="background:#fef3c7;font-weight:800"><td>${esc(r.station)}</td><td colspan="4">${esc(r.label)}</td><td>${r.net}</td><td>${r.adj}</td><td>${r.cum}</td></tr>`;return;}
+    if(r.subtotal){
+      body+=`<tr style="background:#fef3c7;font-weight:800"><td>${esc(r.station)}</td><td colspan="2">${esc(r.label)}</td><td></td><td></td><td>${r.net}</td><td>${r.adj}</td>`;
+      if(showApproved)body+=`<td>${r.contractor}</td><td>${r.consultant}</td><td>${r.employer}</td>`;
+      body+=`<td>${r.cum}</td>`;
+      if(overhead)body+=`<td>${r.overheadAmtStr}</td><td>${r.afterOverheadStr}</td>`;
+      if(vat)body+=`<td>${r.vatAmtStr}</td><td>${r.finalAmtStr}</td>`;
+      body+='</tr>';
+      return;
+    }
     const typeFa=r.t==='adjustment'?'تعدیل':'صورت وضعیت';
-    body+=`<tr><td>${esc(r.station)}</td><td>${typeFa}</td><td>${esc(r.num)}</td><td>${jalaliFmt(r.fromRaw)}</td><td>${jalaliFmt(r.toRaw)}</td><td>${r.net}</td><td>${r.adj}</td><td>${r.cum}${r.isAuto?' (خودکار)':''}</td></tr>`;
+    body+=`<tr><td>${esc(r.station)}</td><td>${typeFa}</td><td>${esc(r.num)}</td><td>${jalaliFmt(r.fromRaw)}</td><td>${jalaliFmt(r.toRaw)}</td><td>${r.net}</td><td>${r.adj}</td>`;
+    if(showApproved)body+=`<td>${r.contractor}</td><td>${r.consultant}</td><td>${r.employer}</td>`;
+    body+=`<td>${r.cum}${r.isAuto?' (خودکار)':''}</td>`;
+    if(overhead)body+=`<td>${r.overheadAmtStr}</td><td>${r.afterOverheadStr}</td>`;
+    if(vat)body+=`<td>${r.vatAmtStr}</td><td>${r.finalAmtStr}</td>`;
+    body+='</tr>';
   });
-  body+=`<tr style="background:#e0f5e8;font-weight:800"><td colspan="5">جمع کل</td><td>${fmtMoney(totalNet)}</td><td>${fmtMoney(totalAdj)}</td><td>${fmtMoney(totalCum)}</td></tr>`;
+  let totRow=`<tr style="background:#e0f5e8;font-weight:800"><td colspan="5">جمع کل</td><td>${fmtMoney(totalNet)}</td><td>${fmtMoney(totalAdj)}</td>`;
+  if(showApproved)totRow+=`<td>${fmtMoney(R.totalContractor)}</td><td>${fmtMoney(R.totalConsultant)}</td><td>${fmtMoney(R.totalEmployer)}</td>`;
+  totRow+=`<td>${fmtMoney(totalCum)}</td>`;
+  if(overhead)totRow+=`<td>${fmtMoney(totalOverhead)}</td><td>${fmtMoney(totalNet+totalAdj+totalOverhead)}</td>`;
+  if(vat)totRow+=`<td>${fmtMoney(totalVat)}</td><td>${fmtMoney(totalFinal)}</td>`;
+  totRow+='</tr>';
+  body+=totRow;
+  let headRow='<tr><th>نام ایستگاه</th><th>نوع</th><th>شماره</th><th>از تاریخ</th><th>تا تاریخ</th><th>مبلغ دوره (ریال)</th><th>مبلغ تعدیل (ریال)</th>';
+  if(showApproved)headRow+='<th>اعلامی پیمانکار</th><th>تاییدی مشاور</th><th>تاییدی کارفرما</th>';
+  headRow+='<th>مبلغ تجمعی (ریال)</th>';
+  if(overhead)headRow+=`<th>بالاسری ٪${overheadPct}</th><th>با احتساب بالاسری</th>`;
+  if(vat)headRow+=`<th>ارزش افزوده ٪${vatPct}</th><th>جمع کل با ارزش افزوده</th>`;
+  headRow+='</tr>';
   pa.innerHTML=`
     <div class="pr-title">گزارش صورت وضعیت‌ها و تعدیل‌ها — مکو</div>
     <div class="pr-sub">ایستگاه: <b>${esc(filterTxt)}</b> &nbsp;|&nbsp; نوع: <b>${typeFilter==='all'?'همه':(typeFilter==='normal'?'صورت وضعیت':'تعدیل')}</b></div>
     <table>
-      <thead><tr><th>نام ایستگاه</th><th>نوع</th><th>شماره</th><th>از تاریخ</th><th>تا تاریخ</th><th>مبلغ دوره (ریال)</th><th>مبلغ تعدیل (ریال)</th><th>مبلغ تجمعی (ریال)</th></tr></thead>
+      <thead>${headRow}</thead>
       <tbody>${body}</tbody>
     </table>
     <div class="pr-footer">© ${new Date().getFullYear()} MECO — All rights reserved.<br>Designed by <b>Bamdad Roozegar</b>.</div>`;
   pa.style.display='block';
-  setTimeout(()=>{window.print();pa.style.display='none';},600);
+  /* فعال کردن حالت افقی */
+  document.body.classList.add('print-landscape');
+  /* درج استایل پویا برای landscape */
+  var styleEl=document.getElementById('landscapeStyle');
+  if(!styleEl){
+    styleEl=document.createElement('style');
+    styleEl.id='landscapeStyle';
+    document.head.appendChild(styleEl);
+  }
+  styleEl.textContent='@page{size:A4 landscape;margin:10mm 8mm}';
+  setTimeout(function(){
+    window.print();
+    pa.style.display='none';
+    document.body.classList.remove('print-landscape');
+    if(styleEl)styleEl.textContent='';
+  },600);
 }
-
+/* ===== Excel Import ===== */
 const EXCEL_COL_ALIASES={
   station_name:['station_name','station','ایستگاه','نام ایستگاه'],
   type:['type','نوع','نوع آیتم'],
@@ -1757,6 +2149,9 @@ const EXCEL_COL_ALIASES={
   period_from:['period_from','from','از تاریخ','شروع دوره','تاریخ شروع دوره','start_date'],
   period_to:['period_to','to','تا تاریخ','پایان دوره','تاریخ پایان دوره','end_date'],
   cum_amount:['cum_amount','مبلغ تجمعی','مبلغ تجمعی تا دوره اعلامی','تجمعی'],
+  contractor_amount:['contractor_amount','اعلامی پیمانکار','مبلغ اعلامی پیمانکار','مبلغ پیمانکار'],
+  consultant_amount:['consultant_amount','تاییدی مشاور','مبلغ تاییدی مشاور','مبلغ مشاور'],
+  employer_amount:['employer_amount','تاییدی کارفرما','مبلغ تاییدی کارفرما','مبلغ کارفرما'],
   name:['name','نام','عنوان','شرح','نام آیتم']
 };
 function mapHeaderToField(header){
@@ -2022,6 +2417,9 @@ function applyExcelImport(){
     const net=xlNum(r.net_amount);
     const adj=xlNum(r.adj_amount);
     const cum=xlNum(r.cum_amount);
+    const ctr=xlNum(r.contractor_amount);
+    const cst=xlNum(r.consultant_amount);
+    const emp=xlNum(r.employer_amount);
     const key=invKey(numRaw,type);
     let inv=st.invoices[key];
     if(!inv){
@@ -2036,9 +2434,17 @@ function applyExcelImport(){
     else{if(net!=null)inv.netAmount=net;}
     if(cum!=null){inv.cumAmount=cum;inv.cumManual=true;inv.cumAuto=false;}
     else{inv.cumManual=false;inv.cumAuto=true;}
+    if(ctr!=null)inv.contractorAmount=ctr;
+    if(cst!=null)inv.consultantAmount=cst;
+    if(emp!=null)inv.employerAmount=emp;
     const explicitName=r.name?String(r.name).trim():null;
     if(explicitName&&explicitName!==String(numRaw))inv.label=explicitName;
-    /* اطمینان از وجود مرحله نقد */
+    if(Array.isArray(inv.stages)&&!inv.stages.some(s=>s&&s.name&&s.name.trim()==='تهیه روکش و ثبت دبیرخانه')){
+      const roofStage={name:'تهیه روکش و ثبت دبیرخانه',resp:'',start:'',end:'',progress:0,status:'none',notes:''};
+      const idx=inv.stages.findIndex(x=>x&&x.name&&x.name.indexOf('ارسال')>-1&&x.name.indexOf('مشاور کارفرما')>-1);
+      if(idx>=0)inv.stages.splice(idx+1,0,roofStage);
+      else inv.stages.splice(Math.min(4,inv.stages.length),0,roofStage);
+    }
     if(Array.isArray(inv.stages)&&!inv.stages.some(s=>s&&s.name&&s.name.trim()===CASH_STAGE_NAME)){
       inv.stages.push({name:CASH_STAGE_NAME,resp:'',start:'',end:'',progress:0,status:'none',notes:'این مرحله معادل نقد شدن مبلغ است'});
     }
@@ -2058,20 +2464,233 @@ function downloadExcelTemplate(){
   }
   const wb=XLSX.utils.book_new();
   const rows=[
-    ['نام ایستگاه','نوع','شماره','مبلغ دوره','مبلغ تعدیل','از تاریخ','تا تاریخ'],
-    ['اکباتان','صورت وضعیت',1,15000000,'','1403/01/01','1403/02/01'],
-    ['اکباتان','صورت وضعیت',2,18000000,'','1403/02/01','1403/03/01'],
-    ['اکباتان','تعدیل',1,'',3000000,'1403/02/01','1403/03/01'],
-    ['هنگام','صورت وضعیت',1,12000000,'','1403/01/01','1403/02/01'],
-    ['بعثت','صورت وضعیت',1,9000000,'','1403/01/01','1403/02/01']
+    ['نام ایستگاه','نوع','شماره','مبلغ دوره','مبلغ تعدیل','اعلامی پیمانکار','تاییدی مشاور','تاییدی کارفرما','از تاریخ','تا تاریخ'],
+    ['اکباتان','صورت وضعیت',1,15000000,'',15000000,14800000,14500000,'1403/01/01','1403/02/01'],
+    ['اکباتان','صورت وضعیت',2,18000000,'',18000000,17800000,17500000,'1403/02/01','1403/03/01'],
+    ['اکباتان','تعدیل',1,'',3000000,3000000,2900000,2850000,'1403/02/01','1403/03/01'],
+    ['هنگام','صورت وضعیت',1,12000000,'','','','','1403/01/01','1403/02/01'],
+    ['بعثت','صورت وضعیت',1,9000000,'','','','','1403/01/01','1403/02/01']
   ];
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:18},{wch:14},{wch:10},{wch:18},{wch:18},{wch:14},{wch:14}];
+  ws['!cols']=[{wch:18},{wch:14},{wch:10},{wch:18},{wch:18},{wch:18},{wch:18},{wch:18},{wch:14},{wch:14}];
   ws['!views']=[{RTL:true}];
   XLSX.utils.book_append_sheet(wb,ws,'Invoices');
-  XLSX.writeFile(wb,'mokho_excel_template.xlsx');
+  XLSX.writeFile(wb,'meco_excel_template.xlsx');
 }
 
+/* ===== Templates (نامه‌های نمونه) ===== */
+function getConsultants(){
+  if(!DB.consultants||!Array.isArray(DB.consultants)||!DB.consultants.length){
+    DB.consultants=JSON.parse(JSON.stringify(DEFAULT_CONSULTANTS));
+  }
+  return DB.consultants;
+}
+function openTemplates(){
+  const grid=document.getElementById('tplGrid');
+  const consultants=getConsultants();
+  grid.innerHTML=consultants.map(c=>{
+    const hasWord=!!(c.letterFileData||c.letterHtml);
+    const hasExcel=!!(c.excelFileData);
+    return `
+    <div class="tpl-card" style="border-inline-start:4px solid ${c.color}">
+      <div class="head"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c.color}"></span>${esc(c.name)}</div>
+      <div class="desc">${esc(c.desc||'')}<br><b style="color:var(--muted)">پیش‌شماره: ${esc(c.prefix||'—')}</b></div>
+      <div class="acts">
+        <button class="dl-word" onclick="downloadConsultantWord('${c.id}')" ${hasWord?'':'disabled title="قالب Word تعریف نشده"'}>📄 نامه Word</button>
+        <button class="dl-excel" onclick="downloadConsultantExcel('${c.id}')" ${hasExcel?'':'disabled title="قالب Excel بارگذاری نشده"'}>📊 جدول Excel</button>
+      </div>
+    </div>`;}).join('');
+  document.getElementById('templatesOverlay').classList.add('show');
+}
+function closeTemplates(){document.getElementById('templatesOverlay').classList.remove('show');}
+document.getElementById('templatesOverlay').addEventListener('click',e=>{if(e.target.id==='templatesOverlay')closeTemplates();});
+
+/* ===== Download helpers ===== */
+function base64ToBlob(b64,mime){
+  const bin=atob(b64);
+  const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+function downloadBlob(blob,filename){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function downloadConsultantWord(id){
+  const c=getConsultants().find(x=>x.id===id);if(!c)return;
+  if(c.letterFileData){
+    const mime=c.letterFileName&&c.letterFileName.toLowerCase().endsWith('.docx')?'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'application/msword';
+    downloadBlob(base64ToBlob(c.letterFileData,mime),c.letterFileName||('meco_template_'+c.id+'_letter.doc'));
+    return;
+  }
+  const today=new Date();
+  const fa=today.toLocaleDateString('fa-IR');
+  const html=(c.letterHtml||'').replace(/\{DATE\}/g,fa).replace(/\{CONSULTANT\}/g,c.name).replace(/\{PREFIX\}/g,c.prefix||'');
+  if(!html){alert('برای این مشاور قالب Word تعریف نشده است. مدیر سیستم باید فایل یا متن نامه را بارگذاری کند.');return;}
+  const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+  downloadBlob(blob,'meco_template_'+c.id+'_letter.doc');
+}
+function downloadConsultantExcel(id){
+  if(typeof XLSX==='undefined'){alert('کتابخانه SheetJS بارگذاری نشده است.');return;}
+  const c=getConsultants().find(x=>x.id===id);if(!c)return;
+  if(c.excelFileData){
+    const mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    downloadBlob(base64ToBlob(c.excelFileData,mime),c.excelFileName||('meco_template_'+c.id+'_form.xlsx'));
+    return;
+  }
+  alert('برای این مشاور قالب Excel تعریف نشده است. مدیر سیستم باید فایل را بارگذاری کند.');
+}
+
+/* ===== Manage Templates (admin only) ===== */
+function openManageTpl(){
+  /* بررسی نقش viewer به‌صورت مستقیم از sessionStorage */
+  try{
+    var s=JSON.parse(sessionStorage.getItem('meco_auth_session_v1')||'null');
+    if(s&&s.role==='viewer'){alert('⛔ مدیریت قالب‌ها فقط برای نقش مدیر مجاز است.');return;}
+  }catch(e){}
+  try{
+    renderManageTplGrid();
+    document.getElementById('tplEditForm').classList.remove('show');
+    document.getElementById('manageTplOverlay').classList.add('show');
+  }catch(e){
+    alert('خطا در باز کردن پنل مدیریت: '+e.message);
+    console.error(e);
+  }
+}
+function closeManageTpl(){document.getElementById('manageTplOverlay').classList.remove('show');}
+document.getElementById('manageTplOverlay').addEventListener('click',e=>{if(e.target.id==='manageTplOverlay')closeManageTpl();});
+
+function renderManageTplGrid(){
+  const grid=document.getElementById('tplMngGrid');
+  const consultants=getConsultants();
+  grid.innerHTML=consultants.map(c=>`
+    <div class="tpl-mng-card">
+      <div class="head"><span class="swatch" style="background:${c.color}"></span>${esc(c.name)}</div>
+      <div class="row">پیش‌شماره: <b>${esc(c.prefix||'—')}</b></div>
+      <div class="row">قالب Word: ${c.letterFileData?'<b style="color:#16a34a">✓ بارگذاری شده</b>':(c.letterHtml?'<b style="color:#f59e0b">متن موجود</b>':'<b style="color:#b91c1c">✗ ندارد</b>')}</div>
+      <div class="row">قالب Excel: ${c.excelFileData?'<b style="color:#16a34a">✓ بارگذاری شده</b>':'<b style="color:#b91c1c">✗ ندارد</b>'}</div>
+      <div class="acts">
+        <button class="b-edit" onclick="editConsultant('${c.id}')">✏️ ویرایش</button>
+        <button class="b-del" onclick="deleteConsultant('${c.id}')">🗑 حذف</button>
+      </div>
+    </div>`).join('');
+}
+
+function startAddConsultant(){
+  const newC={id:uid(),name:'مشاور جدید',prefix:'',color:'#7c3aed',desc:'',letterFileData:null,excelFileData:null,letterFileName:null,excelFileName:null,letterHtml:''};
+  getConsultants().push(newC);
+  pushUndo();
+  save();
+  renderManageTplGrid();
+  editConsultant(newC.id);
+}
+function editConsultant(id){
+  const c=getConsultants().find(x=>x.id===id);if(!c)return;
+  const form=document.getElementById('tplEditForm');
+  form.innerHTML=`
+    <h3 style="font-size:.95rem;margin-bottom:8px;color:var(--accent-dark);font-weight:800">✏️ ویرایش مشاور</h3>
+    <label>نام مشاور</label>
+    <input type="text" id="ct_name" value="${esc(c.name)}">
+    <label>پیش‌شماره نامه</label>
+    <input type="text" id="ct_prefix" value="${esc(c.prefix||'')}">
+    <label>رنگ اختصاصی</label>
+    <div class="color-row">
+      <input type="color" id="ct_color" value="${c.color||'#7c3aed'}">
+      <span style="font-size:.75rem;color:var(--muted)">برای قالب‌های Word و کارت مشاور</span>
+    </div>
+    <label>توضیح</label>
+    <input type="text" id="ct_desc" value="${esc(c.desc||'')}">
+    <label>متن نامه (اختیاری — به‌صورت HTML)</label>
+    <textarea id="ct_letterHtml">${esc(c.letterHtml||'')}</textarea>
+    <div class="file-info">اگر نمی‌خواهید فایل Word بارگذاری کنید، می‌توانید متن HTML نامه را در این کادر بنویسید. متغیرهای {DATE}، {CONSULTANT}، {PREFIX} خودکار جایگزین می‌شوند.</div>
+    <label>بارگذاری فایل Word (.doc/.docx)</label>
+    <div class="file-row">
+      <input type="file" id="ct_letterFile" accept=".doc,.docx">
+      ${c.letterFileData?`<button type="button" class="mini-btn" onclick="removeConsultantFile('${c.id}','letter')">حذف فایل</button>`:''}
+    </div>
+    <div class="file-info">${c.letterFileName?('فایل فعلی: '+esc(c.letterFileName)):''}</div>
+    <label>بارگذاری فایل Excel (.xlsx)</label>
+    <div class="file-row">
+      <input type="file" id="ct_excelFile" accept=".xlsx,.xls">
+      ${c.excelFileData?`<button type="button" class="mini-btn" onclick="removeConsultantFile('${c.id}','excel')">حذف فایل</button>`:''}
+    </div>
+    <div class="file-info">${c.excelFileName?('فایل فعلی: '+esc(c.excelFileName)):''}</div>
+    <div class="actions">
+      <button class="cancel" onclick="document.getElementById('tplEditForm').classList.remove('show')">انصراف</button>
+      <button class="save" onclick="saveConsultant('${c.id}')">ذخیره</button>
+    </div>`;
+  form.classList.add('show');
+}
+function removeConsultantFile(id,type){
+  const c=getConsultants().find(x=>x.id===id);if(!c)return;
+  if(type==='letter'){c.letterFileData=null;c.letterFileName=null;}
+  else{c.excelFileData=null;c.excelFileName=null;}
+  save();
+  editConsultant(id);
+  renderManageTplGrid();
+}
+function saveConsultant(id){
+  const c=getConsultants().find(x=>x.id===id);if(!c)return;
+  c.name=document.getElementById('ct_name').value.trim()||'مشاور بدون نام';
+  c.prefix=document.getElementById('ct_prefix').value.trim();
+  c.color=document.getElementById('ct_color').value;
+  c.desc=document.getElementById('ct_desc').value.trim();
+  c.letterHtml=document.getElementById('ct_letterHtml').value;
+  const lf=document.getElementById('ct_letterFile').files[0];
+  const ef=document.getElementById('ct_excelFile').files[0];
+  const MAX_SIZE=500*1024;
+  const proceed=()=>{ save(); renderManageTplGrid(); document.getElementById('tplEditForm').classList.remove('show'); alert('✅ اطلاعات مشاور ذخیره شد.'); };
+  const readFiles=()=>{
+    if(lf){
+      if(lf.size>MAX_SIZE){alert('حجم فایل Word بیش از ۵۰۰ کیلوبایت است.');return;}
+      const r=new FileReader();
+      r.onload=()=>{
+        const b64=String(r.result).split(',')[1];
+        c.letterFileData=b64;c.letterFileName=lf.name;
+        if(ef){
+          if(ef.size>MAX_SIZE){alert('حجم فایل Excel بیش از ۵۰۰ کیلوبایت است.');return;}
+          const r2=new FileReader();
+          r2.onload=()=>{
+            const b642=String(r2.result).split(',')[1];
+            c.excelFileData=b642;c.excelFileName=ef.name;
+            proceed();
+          };
+          r2.readAsDataURL(ef);
+        } else { proceed(); }
+      };
+      r.readAsDataURL(lf);
+    } else if(ef){
+      if(ef.size>MAX_SIZE){alert('حجم فایل Excel بیش از ۵۰۰ کیلوبایت است.');return;}
+      const r2=new FileReader();
+      r2.onload=()=>{
+        const b642=String(r2.result).split(',')[1];
+        c.excelFileData=b642;c.excelFileName=ef.name;
+        proceed();
+      };
+      r2.readAsDataURL(ef);
+    } else { proceed(); }
+  };
+  readFiles();
+}
+function deleteConsultant(id){
+  const c=getConsultants().find(x=>x.id===id);if(!c)return;
+  if(!confirm('مشاور «'+c.name+'» و قالب‌هایش حذف شود؟'))return;
+  pushUndo();
+  DB.consultants=DB.consultants.filter(x=>x.id!==id);
+  save();
+  renderManageTplGrid();
+  document.getElementById('editForm')&&document.getElementById('editForm').classList.remove('show');
+  document.getElementById('tplEditForm').classList.remove('show');
+  renderTemplatesIfOpen();
+}
+function renderTemplatesIfOpen(){
+  if(document.getElementById('templatesOverlay').classList.contains('show')) openTemplates();
+}
+
+/* ===== Worker Sync ===== */
 const WORKER_URL = "https://meco-tracker-api.bamdad-roozegar.workers.dev";
 function getAuthHeader(){
   const session=JSON.parse(sessionStorage.getItem("meco_auth_session_v1")||"null");
@@ -2105,6 +2724,8 @@ async function gistPull(){
         imported.stations.forEach(st=>migrateOldInvoices(st));
       }
       DB=imported;
+      if(!DB.consultants||!DB.consultants.length)DB.consultants=JSON.parse(JSON.stringify(DEFAULT_CONSULTANTS));
+      DB.stations.forEach(st=>migrateRoofStage(st));
       DB.stations.forEach(st=>migrateCashStage(st));
       computeAllCumulative();
       localStorage.setItem("mokho_db",JSON.stringify(DB));
@@ -2134,7 +2755,15 @@ async function gistPush(){
 }
 
 window.__mecoInit=function(){load();renderAll();refreshUndoBtn();};
-
+/* fallback سراسری — اگر AUTH هنوز لود نشده باشد */
+if(typeof window.isViewer!=='function'){
+  window.isViewer=function(){
+    try{
+      var s=JSON.parse(sessionStorage.getItem('meco_auth_session_v1')||'null');
+      return !!(s&&s.role==='viewer');
+    }catch(e){return false;}
+  };
+}
 function playLogoutScene(andShowLogin){
   var ov=document.getElementById('logoutOverlay');
   var bus=ov.querySelector('.lo-bus');
@@ -2207,10 +2836,10 @@ function playLogoutScene(andShowLogin){
 body.mt-viewer #addStationBtn,body.mt-viewer #editAddBtn,body.mt-viewer #addInvoiceBtn,
 body.mt-viewer #delInvoiceBtn,body.mt-viewer #toggleTypeBtn,body.mt-viewer #renameInvoiceBtn,
 body.mt-viewer #editMetaBtn,body.mt-viewer .btn-excel,body.mt-viewer .btn-excel-template,
-body.mt-viewer #completeAllBtn,
+body.mt-viewer #completeAllBtn,body.mt-viewer .btn-manage-tpl,
 body.mt-viewer .btn-push,body.mt-viewer #undoBtn,
 body.mt-viewer .btn-sync-cfg,body.mt-viewer .icon-btn{display:none!important}
-body.mt-viewer .btn-pull,body.mt-viewer .btn-report{display:inline-flex!important}
+body.mt-viewer .btn-pull,body.mt-viewer .btn-report,body.mt-viewer .btn-templates{display:inline-flex!important}
 #mtUsersModal{position:fixed;inset:0;background:oklch(15% 0.01 220/.6);display:none;align-items:center;justify-content:center;z-index:99998}
 #mtUsersModal.show{display:flex}
 #mtUsersBox{background:var(--card);border-radius:16px;padding:24px;width:min(520px,94vw);max-height:88vh;overflow-y:auto;font-family:inherit}
@@ -2453,7 +3082,7 @@ function ensureSeed(){
   if(!a){return hashPw(MT_DEFAULT_ADMIN_PW()).then(function(h){users.push({u:'admin',p:h,role:'admin'});saveUsers(users);});}
   return Promise.resolve();
 }
-var MUTATORS=['addStation','renameStation','deleteStation','saveStage','deleteStage','moveStage','restoreJSON','gistPush','renameInvoice','confirmAddInv','undoLast','openEditInvoiceMeta','applyExcelImport','applyCompleteAll'];
+var MUTATORS=['addStation','renameStation','deleteStation','saveStage','deleteStage','moveStage','restoreJSON','gistPush','renameInvoice','confirmAddInv','undoLast','openEditInvoiceMeta','applyExcelImport','applyCompleteAll','startAddConsultant','saveConsultant','deleteConsultant','removeConsultantFile'];
 window.__mtViewerCanPull=true;
 function isViewer(){var s=getSession();return !!s&&s.role==='viewer';}
 MUTATORS.forEach(function(fn){
@@ -2473,7 +3102,9 @@ document.addEventListener('click',function(e){
   if(t.closest&&(t.closest('#invoiceSelect')||t.closest('.stage-card')||t.closest('#stagesGrid')))return;
   if(t.closest&&t.closest('.btn-pull'))return;
   if(t.closest&&t.closest('.btn-report'))return;
+  if(t.closest&&t.closest('.btn-templates'))return;
   if(t.closest&&t.closest('#reportOverlay'))return;
+  if(t.closest&&t.closest('#templatesOverlay'))return;
   var id=t.id&&BLOCK_CLICK_IDS[t.id];
   if(!id&&t.closest){var anc=t.closest('[id]');if(anc&&BLOCK_CLICK_IDS[anc.id])id=anc.id;}
   if(!id&&t.closest&&t.closest('.icon-btn,.btn-push,.btn-excel,.btn-excel-template,.btn-sync-cfg,#undoBtn,#completeAllBtn'))id='ctrl';
@@ -2500,6 +3131,7 @@ function renderUserBar(){
   var roleFa=s.role==='admin'?'مدیر':'نمایش‌دهنده';
   var html='<span>کاربر: <b>'+s.u+'</b> | نقش: <b>'+(s.role==='admin'?'admin':'viewer')+'</b> ('+roleFa+')</span>';
   if(s.role==='admin')html+='<button id="mtOpenUsers" title="مدیریت کاربران">👤 مدیریت کاربران</button>';
+  if(s.role==='admin')html+='<button class="btn-manage-tpl btn" id="mtManageTplBtn" style="padding:6px 12px;font-size:.78rem;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-family:inherit;color:var(--text);margin-inline-start:4px" onclick="openManageTpl()">⚙️ مدیریت قالب‌ها</button>';
   html+='<button id="mtLogoutBtn">🚪 خروج</button>';
   bar.innerHTML=html;
   var ou=document.getElementById('mtOpenUsers');
@@ -2510,6 +3142,8 @@ function renderUserBar(){
     renderUserBar();
     playLogoutScene(true);
   };
+    var bmt=document.getElementById('btnManageTpl');
+  if(bmt)bmt.style.display=(s.role==='admin')?'inline-flex':'none';
 }
 function renderUserList(){
   var box=document.getElementById('mtUserList');
