@@ -596,7 +596,87 @@ body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important
 .gg-row .gg-track .fill{inset-inline-start:0;left:auto;border-radius:4px}
 @media(max-width:900px){.dashboard-grid{grid-template-columns:1fr}.dashboard-grid .chart-col:first-child{border-inline-end:none;border-bottom:1px solid var(--border)}.gg-list{grid-template-columns:1fr}}
 
+
+/* ===== v4: stages in 3 rows of 5 + dashboard bars 3x5 ===== */
+.stage-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:start}
+.shead{padding:9px 10px 10px;gap:6px 8px}
+.shead .snum{order:1;width:24px;height:24px;font-size:.68rem}
+.shead .stext{order:2;flex:1 1 0;min-width:0}
+.shead .badge{order:3;font-size:.62rem;padding:1px 7px}
+.shead .chev{order:4;margin-inline-start:auto}
+.shead .sprog{order:5;flex-basis:100%}
+.sname{font-size:.78rem;line-height:1.55;min-height:3.1em;align-items:flex-start}
+.smeta{flex-direction:column;gap:1px;font-size:.64rem}
+.sbody{padding:9px 10px 10px;gap:9px}
+.qchips{flex-wrap:wrap}
+.qchip{padding:3px 7px;font-size:.68rem}
+.sctrl .sstatus{flex:1 1 100%}
+.sactions button{flex:1 1 44%;padding:4px 6px;font-size:.68rem}
+.gg-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:9px 14px}
+@media(max-width:1100px){.stage-list,.gg-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.stage-list,.gg-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:460px){.stage-list,.gg-list{grid-template-columns:1fr}}
+
+/* ===== v4: themes ===== */
+:root{--track:#e8ecf0;--on-accent:oklch(15% 0.02 220);--on-accent-dark:#fff}
+.pbar,.gg-row .gg-track{background:var(--track)}
+.srow.done .scard{background:color-mix(in oklch,#16a34a 6%,var(--card))}
+#invInfoStrip{background:color-mix(in oklch,var(--accent) 6%,var(--card))}
+html[data-theme="dusk"]{color-scheme:dark;--bg-sidebar:oklch(13% 0.025 260);--bg-main:oklch(18% 0.025 260);--card:oklch(23% 0.027 260);--border:oklch(33% 0.03 260);--text:oklch(94% 0.01 260);--muted:oklch(72% 0.025 260);--accent:oklch(80% 0.15 78);--accent-dark:oklch(84% 0.14 82);--sidebar-text:oklch(92% 0.01 260);--on-accent:oklch(20% 0.03 260);--on-accent-dark:oklch(20% 0.03 260);--track:#343c4f}
+html[data-theme="blueprint"]{--bg-sidebar:oklch(30% 0.12 262);--bg-main:oklch(95.5% 0.02 250);--card:oklch(99% 0.006 250);--border:oklch(86% 0.03 250);--text:oklch(24% 0.05 262);--muted:oklch(52% 0.04 258);--accent:oklch(55% 0.19 262);--accent-dark:oklch(40% 0.17 264);--sidebar-text:oklch(94% 0.02 250);--on-accent:#fff;--track:#dde5f3}
+html[data-theme="grid"]{--bg-sidebar:oklch(25% 0.06 160);--bg-main:oklch(96.5% 0.012 150);--card:oklch(99.5% 0.004 150);--border:oklch(88% 0.025 150);--text:oklch(24% 0.04 160);--muted:oklch(52% 0.04 155);--accent:oklch(68% 0.17 150);--accent-dark:oklch(42% 0.12 155);--sidebar-text:oklch(94% 0.02 150);--on-accent:oklch(18% 0.04 155);--track:#dcebe1}
+html[data-theme="site"]{--bg-sidebar:oklch(24% 0.012 60);--bg-main:oklch(96% 0.006 70);--card:oklch(99.5% 0.003 70);--border:oklch(88% 0.012 70);--text:oklch(24% 0.015 60);--muted:oklch(52% 0.02 65);--accent:oklch(72% 0.17 55);--accent-dark:oklch(48% 0.14 50);--sidebar-text:oklch(94% 0.01 70);--on-accent:oklch(20% 0.03 55);--track:#ebe5dd}
+html[data-theme]:not([data-theme="teal"]) .btn-primary,
+html[data-theme]:not([data-theme="teal"]) #addStationBtn,
+html[data-theme]:not([data-theme="teal"]) .summary-tbl th,
+html[data-theme]:not([data-theme="teal"]) #reportBox table.rep-tbl th,
+html[data-theme]:not([data-theme="teal"]) #excelBox .preview th,
+html[data-theme]:not([data-theme="teal"]) .tpl-edit-form .actions .save{color:var(--on-accent)}
+html[data-theme]:not([data-theme="teal"]) .btn-print,
+html[data-theme]:not([data-theme="teal"]) .pm-btn.primary,
+html[data-theme]:not([data-theme="teal"]) .jdp-grid .day.selected{color:var(--on-accent-dark)}
+html[data-theme]:not([data-theme="teal"]) .station-item:hover{background:color-mix(in oklch,var(--sidebar-text) 9%,var(--bg-sidebar))}
+html[data-theme]:not([data-theme="teal"]) .station-item.active{background:color-mix(in oklch,var(--accent) 24%,var(--bg-sidebar));border-color:color-mix(in oklch,var(--accent) 50%,var(--bg-sidebar))}
+html[data-theme]:not([data-theme="teal"]) #sidebar h1{border-bottom-color:color-mix(in oklch,var(--sidebar-text) 16%,var(--bg-sidebar))}
+html[data-theme="dusk"] .st-done{background:oklch(32% 0.07 155);color:oklch(88% 0.1 155)}
+html[data-theme="dusk"] .st-doing{background:oklch(32% 0.08 250);color:oklch(88% 0.08 250)}
+html[data-theme="dusk"] .st-hold{background:oklch(34% 0.07 85);color:oklch(90% 0.1 85)}
+html[data-theme="dusk"] .st-none{background:oklch(30% 0.02 260);color:oklch(78% 0.02 260)}
+html[data-theme="dusk"] .donut-center .big{color:oklch(78% 0.16 155)}
+.sw{display:inline-flex;flex-shrink:0}
+.sw i{width:13px;height:13px;border-radius:50%;margin-inline-end:-5px;border:1.5px solid var(--card);box-shadow:0 0 0 1px var(--border)}
+#themeMenu .tick{margin-inline-start:auto;opacity:0;color:var(--accent-dark)}
+#themeMenu .dd-item.on{font-weight:800}
+#themeMenu .dd-item.on .tick{opacity:1}
 </style>
+<script>
+(function(){
+var KEY='mecoTheme';
+var T=[['teal','فیروزه‌ای','oklch(15% 0.01 220)','oklch(97% 0.005 220)','oklch(65% 0.13 200)'],
+['dusk','شب ایستگاه','oklch(13% 0.025 260)','oklch(23% 0.027 260)','oklch(80% 0.15 78)'],
+['blueprint','نقشه‌کشی','oklch(30% 0.12 262)','oklch(95.5% 0.02 250)','oklch(55% 0.19 262)'],
+['grid','سبز شبکه','oklch(25% 0.06 160)','oklch(96.5% 0.012 150)','oklch(68% 0.17 150)'],
+['site','کارگاه','oklch(24% 0.012 60)','oklch(96% 0.006 70)','oklch(72% 0.17 55)']];
+function get(){try{return localStorage.getItem(KEY);}catch(e){return null;}}
+function apply(id,save){
+  if(!T.some(function(t){return t[0]===id;}))id='teal';
+  document.documentElement.setAttribute('data-theme',id);
+  var m=document.getElementById('themeMenu');
+  if(m)Array.prototype.forEach.call(m.querySelectorAll('.dd-item'),function(b){b.classList.toggle('on',b.dataset.t===id);});
+  if(save){
+    try{localStorage.setItem(KEY,id);}catch(e){}
+    try{if(typeof renderDonut==='function'&&document.getElementById('donutChart'))renderDonut();}catch(e){}
+  }
+}
+apply(get()||'teal',false);
+document.addEventListener('DOMContentLoaded',function(){
+  var m=document.getElementById('themeMenu');if(!m)return;
+  m.innerHTML=T.map(function(t){return '<button type="button" class="dd-item" data-t="'+t[0]+'"><span class="sw"><i style="background:'+t[2]+'"></i><i style="background:'+t[3]+'"></i><i style="background:'+t[4]+'"></i></span>'+t[1]+'<span class="tick">✓</span></button>';}).join('');
+  m.addEventListener('click',function(e){var b=e.target.closest('.dd-item');if(b)apply(b.dataset.t,true);});
+  apply(document.documentElement.getAttribute('data-theme'),false);
+});
+})();
+</script>
 </head>
 <body>
 
@@ -624,6 +704,10 @@ body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important
           <button class="mini-btn icon" id="toggleTypeBtn" title="تغییر نوع (صورت وضعیت / تعدیل)">🔄</button>
           <button class="mini-btn icon" id="delInvoiceBtn" title="حذف صورت وضعیت فعلی">🗑</button>
         </div>
+      </div>
+      <div class="dd">
+        <button class="tool-btn outline dd-toggle" type="button" title="تغییر تم ظاهری">🎨 تم <span class="car">▾</span></button>
+        <div class="dd-menu" id="themeMenu"></div>
       </div>
       <div class="spacer"></div>
       <div class="sync-chip" id="syncChip"><span class="sdot"></span><span id="syncStatus">همگام‌سازی نشده</span></div>
@@ -1617,7 +1701,7 @@ function renderDonut(){
   if(donutChart){donutChart.destroy();donutChart=null;}
   donutChart=new Chart(cv,{
     type:'doughnut',
-    data:{labels:['انجام شده','باقی‌مانده'],datasets:[{data:[pct,100-pct],backgroundColor:['#16a34a','#e8ecf0'],borderWidth:0,hoverOffset:3}]},
+    data:{labels:['انجام شده','باقی‌مانده'],datasets:[{data:[pct,100-pct],backgroundColor:['#16a34a',(getComputedStyle(document.documentElement).getPropertyValue('--track').trim()||'#e8ecf0')],borderWidth:0,hoverOffset:3}]},
     options:{
       responsive:true,maintainAspectRatio:true,cutout:'76%',
       plugins:{legend:{display:false},
