@@ -613,14 +613,11 @@ body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important
 .sctrl .sstatus{flex:1 1 100%}
 .sactions button{flex:1 1 44%;padding:4px 6px;font-size:.68rem}
 .gg-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:9px 14px}
-@media(max-width:1100px){.stage-list,.gg-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:720px){.stage-list,.gg-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:460px){.stage-list,.gg-list{grid-template-columns:1fr}}
 
 /* ===== v4: themes ===== */
 :root{--track:#e8ecf0;--on-accent:oklch(15% 0.02 220);--on-accent-dark:#fff}
 .pbar,.gg-row .gg-track{background:var(--track)}
-.srow.done .scard{background:color-mix(in oklch,#16a34a 6%,var(--card))}
+.srow.done .scard{background:color-mix(in oklch,var(--c) 7%,var(--card))}
 #invInfoStrip{background:color-mix(in oklch,var(--accent) 6%,var(--card))}
 html[data-theme="dusk"]{color-scheme:dark;--bg-sidebar:oklch(13% 0.025 260);--bg-main:oklch(18% 0.025 260);--card:oklch(23% 0.027 260);--border:oklch(33% 0.03 260);--text:oklch(94% 0.01 260);--muted:oklch(72% 0.025 260);--accent:oklch(80% 0.15 78);--accent-dark:oklch(84% 0.14 82);--sidebar-text:oklch(92% 0.01 260);--on-accent:oklch(20% 0.03 260);--on-accent-dark:oklch(20% 0.03 260);--track:#343c4f}
 html[data-theme="blueprint"]{--bg-sidebar:oklch(30% 0.12 262);--bg-main:oklch(95.5% 0.02 250);--card:oklch(99% 0.006 250);--border:oklch(86% 0.03 250);--text:oklch(24% 0.05 262);--muted:oklch(52% 0.04 258);--accent:oklch(55% 0.19 262);--accent-dark:oklch(40% 0.17 264);--sidebar-text:oklch(94% 0.02 250);--on-accent:#fff;--track:#dde5f3}
@@ -648,6 +645,20 @@ html[data-theme="dusk"] .donut-center .big{color:oklch(78% 0.16 155)}
 #themeMenu .tick{margin-inline-start:auto;opacity:0;color:var(--accent-dark)}
 #themeMenu .dd-item.on{font-weight:800}
 #themeMenu .dd-item.on .tick{opacity:1}
+
+/* ===== v4b: columns of 5, per-stage colors, aligned rows ===== */
+.stage-list{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--rows,5),auto);grid-auto-flow:column;align-items:stretch}
+.srow{display:flex}
+.scard{display:flex;flex-direction:column}
+.shead{flex:1 1 auto;align-content:space-between}
+.sname{min-height:0;font-size:.82rem}
+.nprev{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;white-space:normal;line-height:1.65}
+.gg-list{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--rows,5),auto);grid-auto-flow:column;gap:9px 18px}
+.dashboard-head .dh-legend{display:none}
+html[data-theme] .donut-center .big{color:var(--text)}
+@media(max-width:900px){.stage-list{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row}}
+@media(max-width:700px){.gg-list{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row}}
+@media(max-width:560px){.stage-list,.gg-list{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 </style>
 <script>
 (function(){
@@ -1041,7 +1052,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <script>
 /* ===== constants ===== */
-const HEX=['#d4563f','#d79a3a','#c9b845','#5db56f','#3aabba','#3f7fd4','#7a5bd6','#c25bb8','#2e8ca8'];
+const LEGACY_HEX=['#d4563f','#d79a3a','#c9b845','#5db56f','#3aabba','#3f7fd4','#7a5bd6','#c25bb8','#2e8ca8'];
+const HEX=['#e5484d','#f76b15','#f2b01e','#a4c639','#2fb260','#12a594','#06b6d4','#3b82f6','#5b5bd6','#8e4ec6','#d6409f','#8b5e34','#b4234f','#1f6f43','#27408b'];
 const STATUSES={done:'انجام شده',doing:'در حال انجام',hold:'معلق',none:'انجام نشده'};
 const STATUS_CLASS={done:'st-done',doing:'st-doing',hold:'st-hold',none:'st-none'};
 const CASH_STAGE_NAME='نشستن در حساب';
@@ -1096,6 +1108,7 @@ const SUMMARY_COLLAPSE_KEY='mokho_summary_collapsed';
 function uid(){return Math.random().toString(36).slice(2,10);}
 function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function stageHex(i){return HEX[i%HEX.length];}
+function stageColor(st,i){const c=st&&st.color?String(st.color).toLowerCase():'';return(c&&LEGACY_HEX.indexOf(c)<0)?st.color:stageHex(i);}
 function invKey(num,type){return (type||'normal')+':'+String(num);}
 function parseKey(k){
   if(typeof k!=='string')return {num:String(k),type:'normal'};
@@ -1625,15 +1638,16 @@ function renderStages(){
   if(flt)Array.prototype.forEach.call(flt.querySelectorAll('button'),b=>{b.onclick=()=>{STAGE_FILTER=b.dataset.f;renderStages();};});
   const curIdx=stages.findIndex(s=>s.status!=='done');
   el.className='stage-list'+(inv.type==='adjustment'?' adj':'');
-  let html='';
+  let html='',shown=0;
   stages.forEach((st,i)=>{
     if(STAGE_FILTER!=='all'&&stageGroup(st)!==STAGE_FILTER)return;
+    shown++;
     const p=Math.max(0,Math.min(100,+st.progress||0));
     const done=st.status==='done',isCur=i===curIdx;
-    const hx=done?'#16a34a':(st.color||stageHex(i));
+    const hx=stageColor(st,i);
     const dates=(st.start||st.end)?`<span>📅 <b>${jalaliFmt(st.start)}</b> ← <b>${jalaliFmt(st.end)}</b></span>`:'';
     const resp=st.resp?`<span>👤 <b>${esc(st.resp)}</b></span>`:'';
-    const note=st.notes?`<span title="${esc(st.notes)}">📝 توضیحات</span>`:'';
+    const note=st.notes?`<span class="nprev" title="${esc(st.notes)}">📝 ${esc(st.notes)}</span>`:'';
     html+=`
     <div class="srow${done?' done':''}${isCur?' current':''}${STAGE_OPEN.has(i)?' open':''}" data-i="${i}" style="--c:${hx}">
       <div class="scard">
@@ -1664,6 +1678,7 @@ function renderStages(){
       </div>
     </div>`;
   });
+  el.style.setProperty('--rows',Math.max(1,Math.ceil(shown/3)));
   el.innerHTML=html||'<div class="stage-empty">مرحله‌ای با این فیلتر وجود ندارد.</div>';
 }
 
@@ -1676,8 +1691,9 @@ function renderGantt(){
     listEl.innerHTML='<div class="gg-empty">برای مشاهده دیاگرام، مراحل را تعریف کنید.</div>';
     return;
   }
+  listEl.style.setProperty('--rows',Math.max(1,Math.ceil(inv.stages.length/3)));
   listEl.innerHTML=inv.stages.map((st,i)=>{
-    const c=ST_COLOR[st.status]||ST_COLOR.none;
+    const c=stageColor(st,i);
     const p=Math.max(0,Math.min(100,+st.progress||0));
     return `<div class="gg-row" title="${esc(st.name)} — ٪${p}">
       <div class="gg-label"><span class="num" style="background:${c}">${i+1}</span><span class="nm">${esc(st.name)}</span><span class="pct-mini">٪${p}</span></div>
@@ -1701,12 +1717,12 @@ function renderDonut(){
   if(donutChart){donutChart.destroy();donutChart=null;}
   donutChart=new Chart(cv,{
     type:'doughnut',
-    data:{labels:['انجام شده','باقی‌مانده'],datasets:[{data:[pct,100-pct],backgroundColor:['#16a34a',(getComputedStyle(document.documentElement).getPropertyValue('--track').trim()||'#e8ecf0')],borderWidth:0,hoverOffset:3}]},
+    data:(function(){const trk=(getComputedStyle(document.documentElement).getPropertyValue('--track').trim()||'#e8ecf0');const n=stg.length;if(!n)return{labels:['باقی‌مانده'],datasets:[{data:[100],backgroundColor:[trk],borderWidth:0}]};const d=[],c=[],l=[];stg.forEach((x,i)=>{const p=Math.max(0,Math.min(100,+x.progress||0));d.push(p/n,(100-p)/n);c.push(stageColor(x,i),trk);l.push((i+1)+'. '+x.name,'باقی‌مانده');});return{labels:l,datasets:[{data:d,backgroundColor:c,borderWidth:0,hoverOffset:3}]};})(),
     options:{
       responsive:true,maintainAspectRatio:true,cutout:'76%',
       plugins:{legend:{display:false},
         tooltip:{rtl:true,bodyFont:{family:'Vazirmatn',size:12},titleFont:{family:'Vazirmatn',size:12},
-          callbacks:{label:function(ctx){return ctx.label+': ٪'+ctx.parsed;}}}},
+          filter:function(it){return it.dataIndex%2===0;},callbacks:{title:function(){return '';},label:function(ctx){const x=stg[Math.floor(ctx.dataIndex/2)];return x?(Math.floor(ctx.dataIndex/2)+1)+'. '+x.name+': ٪'+Math.round(+x.progress||0):'';}}}},
       animation:{animateRotate:true,animateScale:false,duration:500}
     }
   });
