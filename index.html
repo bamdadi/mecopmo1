@@ -539,6 +539,63 @@ body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important
 .stage-empty{color:var(--muted);font-size:.85rem;padding:18px;text-align:center;border:1px dashed var(--border);border-radius:12px}
 @media(max-width:700px){#topbar{padding:12px}.sprog{width:96px}.shead{flex-wrap:wrap;gap:8px}.seg{margin-inline-start:0;overflow-x:auto;max-width:100%}.shead .badge{min-width:0}}
 
+/* ===== v3: compact two-column stages + compact dashboard ===== */
+.stage-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;align-items:start;margin-bottom:18px}
+.srow{display:block;padding:0}
+.srow::before,.srail{display:none!important}
+.srow.open{grid-column:auto}
+.scard{border-radius:12px;overflow:hidden}
+.shead{flex-wrap:wrap;gap:6px 10px;padding:9px 12px 10px}
+.shead .snum{width:26px;height:26px;font-size:.72rem;flex-shrink:0}
+.shead .stext{flex:1;min-width:0}
+.shead .sname{font-size:.84rem}
+.shead .badge{min-width:0;padding:2px 9px}
+.shead .sprog{order:5;flex-basis:100%;width:auto}
+.shead .sprog .pbar{height:6px}
+.shead .pct{min-width:34px;font-size:.72rem}
+.srow.current .scard{box-shadow:0 0 0 2px color-mix(in oklch,var(--c) 35%,transparent)}
+.srow.current .snum{box-shadow:none}
+.sbody{padding:10px 12px 12px}
+.sctrl{gap:8px}
+.srange{min-width:120px;flex-basis:100%;order:3}
+@media(max-width:1000px){.stage-list{grid-template-columns:1fr}}
+
+.summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.sum-card{flex:1;min-width:110px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px;border-radius:10px}
+.sum-card::before{width:3px}
+.sum-card .lbl{font-size:.7rem}
+.sum-card .val{font-size:1.05rem;letter-spacing:0}
+
+.dashboard-wrap{padding:0;margin-bottom:18px;border-radius:14px;box-shadow:none;overflow:hidden}
+.dashboard-head{margin:0;padding:10px 16px;cursor:pointer;user-select:none;border-bottom:1px solid var(--border);gap:8px}
+.dashboard-head h2{font-size:.92rem}
+.dashboard-head .sub{margin-inline-start:4px}
+.dashboard-head .dh-legend{margin-inline-start:auto;display:flex;gap:12px;font-size:.68rem;color:var(--muted);font-weight:600}
+.dashboard-head .dh-legend span{display:inline-flex;align-items:center;gap:5px}
+.dashboard-head .dh-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.dashboard-head .dh-car{font-size:.75rem;color:var(--muted);transition:transform .2s}
+.dashboard-wrap.collapsed .dh-car{transform:rotate(90deg)}
+.dashboard-wrap.collapsed .dashboard-grid{display:none}
+.dashboard-grid{display:grid;grid-template-columns:190px minmax(0,1fr);gap:0;padding:0}
+.dashboard-grid .chart-col{background:none;border:none;border-radius:0;min-height:0;padding:14px 16px}
+.dashboard-grid .chart-col:first-child{border-inline-end:1px solid var(--border);align-items:center;justify-content:center;gap:10px}
+.donut-box{flex:none;width:128px;height:128px;padding:0}
+.donut-box canvas{max-height:128px}
+.donut-center .big{font-size:1.45rem;letter-spacing:0}
+.donut-center .lbl{font-size:.62rem;margin-top:2px}
+.dcount{display:flex;gap:6px;width:100%;justify-content:center}
+.dcount div{flex:1;text-align:center;border-radius:8px;padding:4px 2px;background:var(--bg-main);font-size:.6rem;color:var(--muted);font-weight:700;line-height:1.4}
+.dcount b{display:block;font-size:.95rem;color:var(--text)}
+.dcount .g b{color:#16a34a}.dcount .b b{color:#2563eb}.dcount .n b{color:#64748b}
+.gg-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 22px;overflow:visible;padding:0;align-content:start}
+.gg-row{gap:2px}
+.gg-row .gg-label{font-size:.7rem;gap:6px}
+.gg-row .gg-label .num{width:16px;height:16px;border-radius:50%;font-size:.58rem}
+.gg-row .gg-label .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.gg-row .gg-track{height:7px;background:oklch(94% 0.008 220);border:none;border-radius:4px}
+.gg-row .gg-track .fill{inset-inline-start:0;left:auto;border-radius:4px}
+@media(max-width:900px){.dashboard-grid{grid-template-columns:1fr}.dashboard-grid .chart-col:first-child{border-inline-end:none;border-bottom:1px solid var(--border)}.gg-list{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -626,27 +683,20 @@ body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important
     </div>
     <div class="stage-list" id="stagesGrid"></div>
 
-    <div class="dashboard-wrap">
-      <div class="dashboard-head">
+    <div class="dashboard-wrap" id="dashWrap">
+      <div class="dashboard-head" id="dashHead" title="باز / بسته کردن داشبورد">
         <span class="icon">📊</span>
-        <h2>داشبورد پیشرفت مراحل</h2>
-        <span class="sub">نمای گانت و درصد پیشرفت کل</span>
+        <h2>داشبورد پیشرفت</h2>
+        <span class="dh-legend">
+          <span><i style="background:#16a34a"></i>انجام شده</span>
+          <span><i style="background:#2563eb"></i>در حال انجام</span>
+          <span><i style="background:#d9a21b"></i>معلق</span>
+          <span><i style="background:#94a3b8"></i>انجام نشده</span>
+        </span>
+        <span class="dh-car">▾</span>
       </div>
       <div class="dashboard-grid">
         <div class="chart-col">
-          <h3>📈 دیاگرام شماتیک مراحل</h3>
-          <div class="gg-legend">
-            <div class="item"><span class="sw" style="background:linear-gradient(90deg,#34c26e,#1f9e56)"></span> انجام شده</div>
-            <div class="item"><span class="sw" style="background:linear-gradient(90deg,#3f8fdb,#1e3a5f)"></span> در حال انجام</div>
-            <div class="item"><span class="sw" style="background:linear-gradient(90deg,#e8b44a,#b97f19)"></span> معلق</div>
-            <div class="item"><span class="sw" style="background:linear-gradient(90deg,#9aa5b1,#6b7683)"></span> انجام نشده</div>
-          </div>
-          <div class="gg-list" id="ganttList">
-            <div class="gg-empty">برای مشاهده دیاگرام، مراحل را تعریف کنید.</div>
-          </div>
-        </div>
-        <div class="chart-col">
-          <h3>🥯 درصد پیشرفت کل</h3>
           <div class="donut-box">
             <canvas id="donutChart"></canvas>
             <div class="donut-center">
@@ -654,9 +704,11 @@ body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important
               <div class="lbl">پیشرفت کل</div>
             </div>
           </div>
-          <div class="donut-legend">
-            <div class="item"><span class="sw" style="background:#22c55e"></span> انجام شده</div>
-            <div class="item"><span class="sw" style="background:#e5e7eb"></span> باقی‌مانده</div>
+          <div class="dcount" id="dashCounts"></div>
+        </div>
+        <div class="chart-col">
+          <div class="gg-list" id="ganttList">
+            <div class="gg-empty">برای مشاهده دیاگرام، مراحل را تعریف کنید.</div>
           </div>
         </div>
       </div>
@@ -1500,22 +1552,22 @@ function renderStages(){
     const note=st.notes?`<span title="${esc(st.notes)}">📝 توضیحات</span>`:'';
     html+=`
     <div class="srow${done?' done':''}${isCur?' current':''}${STAGE_OPEN.has(i)?' open':''}" data-i="${i}" style="--c:${hx}">
-      <div class="srail"><span class="snum">${done?'✓':i+1}</span></div>
       <div class="scard">
         <div class="shead" role="button" tabindex="0" aria-expanded="${STAGE_OPEN.has(i)}">
+          <span class="snum">${done?'✓':i+1}</span>
           <div class="stext">
-            <div class="sname">${esc(st.name)}${isCur?'<span class="cur-tag">مرحلهٔ جاری</span>':''}</div>
+            <div class="sname">${esc(st.name)}${isCur?'<span class="cur-tag">جاری</span>':''}</div>
             ${(resp||dates||note)?`<div class="smeta">${resp}${dates}${note}</div>`:''}
           </div>
-          <div class="sprog"><div class="pbar"><div class="pfill" style="width:${p}%;background:${hx}"></div></div><span class="pct">٪${p}</span></div>
           <span class="badge ${STATUS_CLASS[st.status]||'st-none'}">${STATUSES[st.status]||''}</span>
           <span class="chev">▾</span>
+          <div class="sprog"><div class="pbar"><div class="pfill" style="width:${p}%;background:${hx}"></div></div><span class="pct">٪${p}</span></div>
         </div>
         <div class="sbody">
           <div class="sctrl stage-edit-only">
             <div class="qchips">${[0,25,50,75,100].map(v=>`<button type="button" class="qchip${p===v?' on':''}" data-v="${v}">${v}٪</button>`).join('')}</div>
-            <input class="srange" type="range" min="0" max="100" step="5" value="${p}" aria-label="درصد پیشرفت">
             <select class="sstatus" aria-label="وضعیت">${Object.entries(STATUSES).map(([k,v])=>`<option value="${k}"${st.status===k?' selected':''}>${v}</option>`).join('')}</select>
+            <input class="srange" type="range" min="0" max="100" step="5" value="${p}" aria-label="درصد پیشرفت">
           </div>
           ${st.notes?`<div class="snotes">${esc(st.notes)}</div>`:''}
           <div class="sactions stage-edit-only">
@@ -1531,6 +1583,7 @@ function renderStages(){
   el.innerHTML=html||'<div class="stage-empty">مرحله‌ای با این فیلتر وجود ندارد.</div>';
 }
 
+const ST_COLOR={done:'#16a34a',doing:'#2563eb',hold:'#d9a21b',none:'#94a3b8'};
 function renderGantt(){
   const listEl=document.getElementById('ganttList');
   const inv=curInvoice();
@@ -1539,23 +1592,14 @@ function renderGantt(){
     listEl.innerHTML='<div class="gg-empty">برای مشاهده دیاگرام، مراحل را تعریف کنید.</div>';
     return;
   }
-  let html='';
-  inv.stages.forEach((st,i)=>{
-    const hx=st.color||stageHex(i);
+  listEl.innerHTML=inv.stages.map((st,i)=>{
+    const c=ST_COLOR[st.status]||ST_COLOR.none;
     const p=Math.max(0,Math.min(100,+st.progress||0));
-    html+=`
-      <div class="gg-row">
-        <div class="gg-label">
-          <span class="num" style="background:${hx}">${i+1}</span>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(st.name)}</span>
-          <span class="pct-mini">٪${p}</span>
-        </div>
-        <div class="gg-track" title="${esc(st.name)} — ٪${p}">
-          <div class="fill${p<10?' small':''}" style="width:${p}%;background:${hx}"></div>
-        </div>
-      </div>`;
-  });
-  listEl.innerHTML=html;
+    return `<div class="gg-row" title="${esc(st.name)} — ٪${p}">
+      <div class="gg-label"><span class="num" style="background:${c}">${i+1}</span><span class="nm">${esc(st.name)}</span><span class="pct-mini">٪${p}</span></div>
+      <div class="gg-track"><div class="fill" style="width:${p}%;background:${c}"></div></div>
+    </div>`;
+  }).join('');
 }
 
 function renderDonut(){
@@ -1563,35 +1607,31 @@ function renderDonut(){
   const pctEl=document.getElementById('donutPct');
   if(!cv)return;
   const inv=curInvoice();
+  const stg=(inv&&inv.stages)||[];
   let pct=0;
-  if(inv&&inv.stages.length){
-    pct=Math.round(inv.stages.reduce((a,s)=>a+(+s.progress||0),0)/inv.stages.length);
-  }
+  if(stg.length)pct=Math.round(stg.reduce((a,x)=>a+(+x.progress||0),0)/stg.length);
   if(pctEl)pctEl.textContent='٪'+pct;
+  const nd=stg.filter(x=>x.status==='done').length,ng=stg.filter(x=>x.status==='doing').length;
+  const cEl=document.getElementById('dashCounts');
+  if(cEl)cEl.innerHTML=`<div class="g"><b>${nd}</b>انجام شده</div><div class="b"><b>${ng}</b>در حال انجام</div><div class="n"><b>${stg.length-nd-ng}</b>باقی‌مانده</div>`;
   if(donutChart){donutChart.destroy();donutChart=null;}
   donutChart=new Chart(cv,{
     type:'doughnut',
-    data:{
-      labels:['انجام شده','باقی‌مانده'],
-      datasets:[{
-        data:[pct,100-pct],
-        backgroundColor:['#22c55e','#e5e7eb'],
-        borderColor:['#16a34a','#d1d5db'],
-        borderWidth:2,
-        hoverOffset:4
-      }]
-    },
+    data:{labels:['انجام شده','باقی‌مانده'],datasets:[{data:[pct,100-pct],backgroundColor:['#16a34a','#e8ecf0'],borderWidth:0,hoverOffset:3}]},
     options:{
-      responsive:true,maintainAspectRatio:true,cutout:'72%',
-      plugins:{
-        legend:{display:false},
+      responsive:true,maintainAspectRatio:true,cutout:'76%',
+      plugins:{legend:{display:false},
         tooltip:{rtl:true,bodyFont:{family:'Vazirmatn',size:12},titleFont:{family:'Vazirmatn',size:12},
-          callbacks:{label:function(ctx){return ctx.label+': ٪'+ctx.parsed;}}}
-      },
-      animation:{animateRotate:true,animateScale:false,duration:600}
+          callbacks:{label:function(ctx){return ctx.label+': ٪'+ctx.parsed;}}}},
+      animation:{animateRotate:true,animateScale:false,duration:500}
     }
   });
 }
+(function(){
+  const w=document.getElementById('dashWrap'),h=document.getElementById('dashHead');if(!w||!h)return;
+  try{if(localStorage.getItem('meco_dash_collapsed')==='1')w.classList.add('collapsed');}catch(e){}
+  h.onclick=()=>{const c=w.classList.toggle('collapsed');try{localStorage.setItem('meco_dash_collapsed',c?'1':'0');}catch(e){}};
+})();
 
 function buildJalaliPicker(containerId,initialVal,onChange){
   const cont=document.getElementById(containerId);if(!cont)return null;
