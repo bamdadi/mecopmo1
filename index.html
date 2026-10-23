@@ -167,7 +167,7 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 @media print{
   body{display:block;background:#fff;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:'Vazirmatn',Tahoma,sans-serif}
   #sidebar,#topbar,#content,#modalBg,#pageFooter,#addInvOverlay,#reportOverlay,#jdatePop,#logoutOverlay,#excelOverlay,#confirmAllOverlay,#templatesOverlay,#manageTplOverlay,#mtUserBar,
-  #invInfoStrip,#summaryTableContainer,#stagesGrid,.dashboard-wrap,.section-title{display:none!important}
+  #invInfoStrip,#summaryTableContainer,#stagesGrid,.stages-head,#toastBox,#pushOverlay,.dashboard-wrap,.section-title{display:none!important}
   #printArea{display:block!important;direction:rtl;font-family:'Vazirmatn',Tahoma,sans-serif}
   *{box-shadow:none!important;background-image:none!important}
   #printArea .pr-title{text-align:center;font-size:15pt;font-weight:900;color:#1e3a5f;margin-bottom:8px;font-family:'Vazirmatn',Tahoma,sans-serif}
@@ -405,6 +405,140 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
 .tpl-edit-form .actions button{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:700}
 .tpl-edit-form .actions .save{background:var(--accent);color:#fff}
 .tpl-edit-form .actions .cancel{background:var(--border);color:var(--text)}
+/* ===================== v2 UI ===================== */
+#topbar{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:12px 24px 10px}
+.tb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.tb-main .station-title{margin-inline-end:4px}
+.tb-tools{padding-top:10px;border-top:1px solid var(--border);gap:8px}
+.tb-group{display:flex;align-items:center;gap:2px;padding:3px;background:var(--bg-main);border:1px solid var(--border);border-radius:11px}
+.inv-actions{display:flex;align-items:center;gap:4px;padding-inline-start:8px;margin-inline-start:4px;border-inline-start:1px solid var(--border)}
+.invoice-box .mini-btn{display:inline-flex;align-items:center;gap:4px;font-weight:600;font-size:.78rem;padding:5px 9px}
+.invoice-box .mini-btn.icon{padding:5px 8px}
+#topbar .tool-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;color:var(--text);padding:7px 12px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s;font-family:inherit}
+#topbar .tool-btn:hover{background:var(--card);border-color:var(--border);color:var(--accent-dark);transform:none;filter:none}
+#topbar .tool-btn.btn-push{background:#2563eb;color:#fff}
+#topbar .tool-btn.btn-push:hover{background:#1d4ed8;color:#fff;border-color:transparent}
+#topbar .tool-btn.btn-pull{color:#15803d}
+#topbar .tool-btn.btn-pull:hover{background:var(--card);color:#166534}
+#topbar .tool-btn.btn-undo{background:transparent;color:var(--text);border-color:var(--border)}
+#topbar .tool-btn.btn-undo:hover:not(:disabled){background:var(--card);border-color:var(--accent)}
+#topbar .tool-btn:disabled{opacity:.4;cursor:not-allowed}
+#topbar .tool-btn.outline{border-color:var(--border);background:var(--card)}
+#topbar .tool-btn.outline:hover{border-color:var(--accent)}
+.dd{position:relative}
+.dd-toggle .car{font-size:.65rem;opacity:.6;transition:.15s}
+.dd.open .dd-toggle .car{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + 6px);inset-inline-start:0;min-width:215px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 34px oklch(30% 0.03 220 / .2);padding:6px;display:none;flex-direction:column;gap:2px;z-index:120}
+.dd.end .dd-menu{inset-inline-start:auto;inset-inline-end:0}
+.dd.open .dd-menu{display:flex}
+#topbar .dd-item{display:flex;align-items:center;gap:9px;width:100%;text-align:right;border:none;background:none;padding:9px 11px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;color:var(--text);font-family:inherit;white-space:nowrap}
+#topbar .dd-item:hover{background:var(--bg-main);color:var(--accent-dark);filter:none;transform:none}
+#topbar .dd-item.danger:hover{color:oklch(55% 0.17 25)}
+.dd-item .ic{width:18px;text-align:center}
+.dd-sep{height:1px;background:var(--border);margin:4px 2px}
+.sync-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;background:var(--bg-main);border:1px solid var(--border);font-size:.74rem;color:var(--muted);font-weight:600;max-width:380px}
+.sync-chip .sdot{width:8px;height:8px;border-radius:50%;background:#94a3b8;flex-shrink:0}
+.sync-chip.ok .sdot{background:#16a34a}
+.sync-chip.dirty{border-color:#f59e0b;color:oklch(45% 0.12 70);background:oklch(97% 0.04 85)}
+.sync-chip.dirty .sdot{background:#f59e0b}
+.sync-chip.busy .sdot{background:#2563eb;animation:syncPulse 1s ease-in-out infinite}
+.sync-chip.err{border-color:#fca5a5;color:#b91c1c;background:oklch(97% 0.02 25)}
+.sync-chip.err .sdot{background:#dc2626}
+@keyframes syncPulse{0%,100%{opacity:1}50%{opacity:.25}}
+#syncStatus{margin:0;color:inherit;font-size:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.mt-viewer .edit-only,body.mt-viewer .stage-edit-only{display:none!important}
+
+/* toast */
+#toastBox{position:fixed;bottom:20px;inset-inline-start:20px;display:flex;flex-direction:column;gap:8px;z-index:300000;pointer-events:none}
+.toast{background:oklch(22% 0.02 220);color:#fff;padding:10px 16px;border-radius:10px;font-size:.82rem;font-weight:600;box-shadow:0 8px 24px oklch(0% 0 0 / .3);opacity:1;transform:none;transition:.3s;border-inline-start:4px solid var(--accent)}
+.toast.ok{border-inline-start-color:#22c55e}.toast.err{border-inline-start-color:#ef4444}
+.toast.out{opacity:0;transform:translateY(8px)}
+
+/* push confirmation */
+#pushOverlay{position:fixed;inset:0;background:oklch(15% 0.02 220 / .65);display:none;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(3px)}
+#pushOverlay.show{display:flex}
+.pm-box{background:var(--card);border-radius:18px;padding:22px 24px;width:min(460px,92vw);box-shadow:0 24px 70px oklch(0% 0 0 / .4)}
+.pm-steps{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:.75rem;font-weight:700;color:var(--muted)}
+.pm-step{display:flex;align-items:center;gap:6px}
+.pm-step i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
+.pm-step.on{color:var(--accent-dark)}.pm-step.on i{background:var(--accent-dark);color:#fff}
+.pm-step.done i{background:#16a34a;color:#fff}
+.pm-line{flex:1;height:2px;background:var(--border);border-radius:2px}
+.pm-box h3{font-size:1.05rem;margin-bottom:10px;font-weight:800}
+.pm-box p{font-size:.84rem;line-height:1.9;color:var(--text);margin-bottom:10px}
+.pm-warn{background:oklch(97% 0.04 85);border:1px solid oklch(85% 0.09 85);border-radius:10px;padding:9px 12px}
+.pm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.pm-stats div{background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:8px 10px;text-align:center}
+.pm-stats b{display:block;font-size:1.15rem;color:var(--accent-dark)}
+.pm-stats span{font-size:.7rem;color:var(--muted)}
+.pm-note{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+.pm-note.bad{color:#b45309;font-weight:700}
+#pmInput{width:100%;border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:1rem;font-family:inherit;text-align:center;outline:none;margin:4px 0 6px}
+#pmInput:focus{border-color:var(--accent)}
+#pmInput.ok{border-color:#16a34a;background:oklch(97% 0.03 155)}
+.pm-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.pm-btn{border:none;border-radius:10px;padding:9px 18px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit}
+.pm-btn.ghost{background:var(--bg-main);color:var(--text);border:1px solid var(--border)}
+.pm-btn.primary{background:var(--accent-dark);color:#fff}
+.pm-btn.danger{background:#2563eb;color:#fff}
+.pm-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* stages v2 */
+.stages-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.sh-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sh-title h2{font-size:1.05rem;color:var(--text);font-weight:800}
+.sh-count{font-size:.74rem;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px}
+.sh-count .mini{width:90px;height:6px;border-radius:4px;background:oklch(93% 0.01 220);overflow:hidden;display:inline-block}
+.sh-count .mini i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),oklch(65% 0.15 155));border-radius:4px;transition:width .4s}
+.seg{display:inline-flex;background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;margin-inline-start:auto}
+.seg button{border:none;background:none;padding:5px 11px;border-radius:7px;font-size:.74rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button.on{background:var(--card);color:var(--accent-dark);box-shadow:0 1px 3px oklch(40% 0.03 220 / .18)}
+.sh-actions{display:flex;gap:8px}
+.sh-actions .btn{padding:7px 13px;font-size:.78rem}
+.stage-list{display:flex;flex-direction:column;margin-bottom:24px}
+.srow{position:relative;display:flex;gap:12px;padding-bottom:8px}
+.srow::before{content:'';position:absolute;inset-inline-start:13px;top:30px;bottom:-6px;width:2px;background:var(--border)}
+.srow:last-child::before{display:none}
+.srow.done::before{background:oklch(80% 0.1 155)}
+.srail{width:28px;flex-shrink:0;display:flex;justify-content:center;padding-top:9px;z-index:1}
+.snum{width:28px;height:28px;border-radius:50%;background:var(--card);border:2px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:800;transition:.2s}
+.srow.done .snum{background:var(--c);color:#fff}
+.srow.current .snum{background:var(--c);color:#fff;box-shadow:0 0 0 4px color-mix(in oklch,var(--c) 22%,transparent)}
+.scard{flex:1;min-width:0;background:var(--card);border:1px solid var(--border);border-inline-start:3px solid var(--c);border-radius:12px;transition:box-shadow .15s,border-color .15s}
+.scard:hover{box-shadow:0 4px 16px oklch(50% 0.03 220 / .12)}
+.srow.current .scard{border-color:color-mix(in oklch,var(--c) 55%,var(--border));border-inline-start-color:var(--c);box-shadow:0 3px 14px color-mix(in oklch,var(--c) 18%,transparent)}
+.srow.done .scard{background:oklch(99% 0.006 155)}
+.shead{display:flex;align-items:center;gap:14px;padding:9px 14px;cursor:pointer;user-select:none}
+.stext{flex:1;min-width:0}
+.sname{font-size:.88rem;font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.5}
+.srow.done .sname{color:var(--muted)}
+.cur-tag{font-size:.62rem;background:var(--c);color:#fff;padding:1px 8px;border-radius:10px;font-weight:700}
+.smeta{font-size:.7rem;color:var(--muted);margin-top:1px;display:flex;gap:14px;flex-wrap:wrap}
+.smeta b{color:var(--text);font-weight:600}
+.sprog{display:flex;align-items:center;gap:8px;width:160px;flex-shrink:0}
+.sprog .pbar{height:7px}
+.shead .badge{min-width:76px;text-align:center}
+.chev{color:var(--muted);transition:transform .2s;font-size:.75rem}
+.srow.open .chev{transform:rotate(180deg)}
+.sbody{display:none;border-top:1px dashed var(--border);padding:11px 14px 12px;gap:11px;flex-direction:column}
+.srow.open .sbody{display:flex}
+.sctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.qchips{display:flex;gap:4px}
+.qchip{border:1px solid var(--border);background:var(--bg-main);border-radius:8px;padding:4px 10px;font-size:.74rem;font-weight:700;cursor:pointer;color:var(--text);font-family:inherit}
+.qchip:hover{border-color:var(--c);color:var(--c)}
+.qchip.on{background:var(--c);border-color:var(--c);color:#fff}
+.srange{flex:1;min-width:140px;accent-color:var(--c);cursor:pointer}
+.sstatus{border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:.78rem;font-family:inherit;background:var(--bg-main);color:var(--text)}
+.snotes{font-size:.76rem;color:var(--muted);background:var(--bg-main);border-radius:8px;padding:7px 10px;white-space:pre-wrap;line-height:1.8}
+.sactions{display:flex;gap:6px;flex-wrap:wrap}
+.sactions button{border:1px solid var(--border);background:var(--card);padding:5px 11px;font-size:.74rem;cursor:pointer;border-radius:8px;color:var(--muted);font-weight:700;font-family:inherit}
+.sactions button:hover{border-color:var(--accent);color:var(--accent-dark)}
+.sactions .del:hover{border-color:oklch(75% 0.12 25);color:oklch(55% 0.17 25)}
+.stage-list.adj .srow.current .snum{box-shadow:0 0 0 4px oklch(85% 0.1 75 / .5)}
+.stage-empty{color:var(--muted);font-size:.85rem;padding:18px;text-align:center;border:1px dashed var(--border);border-radius:12px}
+@media(max-width:700px){#topbar{padding:12px}.sprog{width:96px}.shead{flex-wrap:wrap;gap:8px}.seg{margin-inline-start:0;overflow-x:auto;max-width:100%}.shead .badge{min-width:0}}
+
 </style>
 </head>
 <body>
@@ -413,38 +547,63 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   <h1>⚡ <span id="appTitle" title="برای ویرایش کلیک کنید">ردیاب صورت وضعیت مکو</span><small id="appSub" title="برای ویرایش کلیک کنید">ایستگاه شارژ اتوبوس برقی</small></h1>
   <div class="station-list" id="stationList"></div>
   <button id="addStationBtn"><span id="addStationLabel">＋ افزودن ایستگاه</span></button><button id="editAddBtn" title="ویرایش متن دکمه" style="margin:0 14px 10px;padding:6px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-size:.85rem;color:oklch(55% 0.02 220)">✏️</button>
-  <div class="sidebar-footer">نسخه ۱.۸ — ذخیره‌سازی محلی مرورگر</div>
+  <div class="sidebar-footer">نسخه ۱.۹ — ذخیره‌سازی محلی مرورگر</div>
 </nav>
 
 <div id="main">
   <header id="topbar">
-    <div class="station-title">
-      <span class="icon">🚏</span>
-      <h2 id="stationNameH" title="برای ویرایش کلیک کنید">—</h2>
+    <div class="tb-row tb-main">
+      <div class="station-title">
+        <span class="icon">🚏</span>
+        <h2 id="stationNameH" title="برای ویرایش کلیک کنید">—</h2>
+      </div>
+      <div class="invoice-box">
+        <label>شماره صورت وضعیت:</label>
+        <select id="invoiceSelect"></select>
+        <div class="inv-actions">
+          <button class="mini-btn icon" id="addInvoiceBtn" title="افزودن صورت وضعیت / تعدیل جدید">＋ جدید</button>
+          <button class="mini-btn" id="editMetaBtn" title="ویرایش دوره و مبالغ">💰 دوره/مبلغ</button>
+          <button class="mini-btn" id="renameInvoiceBtn" title="ویرایش نام نمایشی این آیتم">✏️ نام</button>
+          <button class="mini-btn icon" id="toggleTypeBtn" title="تغییر نوع (صورت وضعیت / تعدیل)">🔄</button>
+          <button class="mini-btn icon" id="delInvoiceBtn" title="حذف صورت وضعیت فعلی">🗑</button>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="sync-chip" id="syncChip"><span class="sdot"></span><span id="syncStatus">همگام‌سازی نشده</span></div>
+      <div id="userSlot"></div>
     </div>
-    <div class="invoice-box">
-      <label>شماره صورت وضعیت:</label>
-      <select id="invoiceSelect"></select>
-      <button class="mini-btn" id="addInvoiceBtn" title="افزودن شماره صورت وضعیت جدید">＋</button>
-      <button class="mini-btn" id="delInvoiceBtn" title="حذف صورت وضعیت فعلی">🗑</button>
-      <button class="mini-btn" id="toggleTypeBtn" title="تغییر نوع (صورت وضعیت / تعدیل)">🔄</button>
-      <button class="mini-btn" id="renameInvoiceBtn" title="ویرایش نام نمایشی این آیتم">✏️ نام</button>
-      <button class="mini-btn" id="editMetaBtn" title="ویرایش دوره و مبالغ">💰 دوره/مبلغ</button>
-    </div>
-    <div class="spacer"></div>
-    <div class="action-bar">
-      <button class="btn btn-report" onclick="openReport()">📊 گزارش مبالغ</button>
-      <button class="btn btn-excel" onclick="openExcelImport()">📥 فراخوانی از اکسل</button>
-      <button class="btn btn-templates" onclick="openTemplates()">📁 نامه‌های نمونه</button>
-	  <button class="btn btn-manage-tpl" id="btnManageTpl" onclick="openManageTpl()" style="display:none">⚙️ مدیریت قالب‌ها</button>
-      <button class="btn btn-undo" id="undoBtn" onclick="undoLast()" title="بازگردانی آخرین تغییر" disabled>↩️ Undo</button>
-      <button class="btn btn-push" onclick="gistPush()">☁️ Push</button>
-      <button class="btn btn-pull" onclick="gistPull()">⬇️ Pull</button>
-      <span id="syncStatus"></span>
-      <button class="btn btn-print" onclick="printReport()">🖨 چاپ / PDF</button>
-      <button class="btn btn-backup" onclick="backupJSON()">💾 پشتیبان JSON</button>
-      <button class="btn btn-excel-template" onclick="downloadExcelTemplate()">📄 دانلود قالب اکسل</button>
-      <button class="btn btn-restore" onclick="document.getElementById('restoreFile').click()">📂 بازیابی</button>
+    <div class="tb-row tb-tools">
+      <div class="tb-group" title="همگام‌سازی با سرور">
+        <button class="tool-btn btn-pull" onclick="gistPull()" title="دریافت آخرین داده‌ها از سرور">🔄 Pull</button>
+        <button class="tool-btn btn-push" onclick="gistPush()" title="ارسال داده‌ها به سرور (با تأیید دو مرحله‌ای)">☁️ Push</button>
+      </div>
+      <div class="tb-group">
+        <button class="tool-btn btn-report" onclick="openReport()">📊 گزارش مبالغ</button>
+        <button class="tool-btn btn-print" onclick="printReport()">🖨 چاپ / PDF</button>
+      </div>
+      <div class="dd edit-only">
+        <button class="tool-btn outline dd-toggle" type="button">📗 اکسل <span class="car">▾</span></button>
+        <div class="dd-menu">
+          <button class="dd-item btn-excel" onclick="openExcelImport()"><span class="ic">📥</span>فراخوانی از اکسل</button>
+          <button class="dd-item btn-excel-template" onclick="downloadExcelTemplate()"><span class="ic">📄</span>دانلود قالب اکسل</button>
+        </div>
+      </div>
+      <div class="dd">
+        <button class="tool-btn outline dd-toggle" type="button">💾 پشتیبان <span class="car">▾</span></button>
+        <div class="dd-menu">
+          <button class="dd-item btn-backup" onclick="backupJSON()"><span class="ic">💾</span>پشتیبان JSON</button>
+          <button class="dd-item btn-restore edit-only" onclick="document.getElementById('restoreFile').click()"><span class="ic">📂</span>بازیابی از فایل</button>
+        </div>
+      </div>
+      <div class="dd">
+        <button class="tool-btn outline dd-toggle" type="button">📁 نامه‌ها <span class="car">▾</span></button>
+        <div class="dd-menu">
+          <button class="dd-item btn-templates" onclick="openTemplates()"><span class="ic">📁</span>نامه‌های نمونه</button>
+          <button class="dd-item btn-manage-tpl" id="btnManageTpl" onclick="openManageTpl()" style="display:none"><span class="ic">⚙️</span>مدیریت قالب‌ها</button>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <button class="tool-btn btn-undo" id="undoBtn" onclick="undoLast()" title="بازگردانی آخرین تغییر" disabled>↩️ بازگردانی</button>
       <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreJSON(this)">
     </div>
   </header>
@@ -454,12 +613,18 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   <div id="content">
     <div class="summary" id="summary"></div>
 
-    <div class="section-title">
-      <h2 id="stagesSectionTitle">مراحل صورت وضعیت</h2><div class="line"></div>
-      <button class="btn btn-complete-all" id="completeAllBtn" onclick="openConfirmAll()" title="همه مراحل این آیتم را ۱۰۰٪ کن">✅ همه مراحل ۱۰۰٪</button>
-      <button class="btn btn-primary" onclick="openStageModal()">＋ افزودن مرحله</button>
+    <div class="stages-head">
+      <div class="sh-title">
+        <h2 id="stagesSectionTitle">مراحل صورت وضعیت</h2>
+        <span class="sh-count" id="stagesCount"></span>
+      </div>
+      <div class="seg" id="stageFilter"></div>
+      <div class="sh-actions">
+        <button class="btn btn-complete-all stage-edit-only" id="completeAllBtn" onclick="openConfirmAll()" title="همه مراحل این آیتم را ۱۰۰٪ کن">✅ همه ۱۰۰٪</button>
+        <button class="btn btn-primary stage-edit-only" onclick="openStageModal()">＋ افزودن مرحله</button>
+      </div>
     </div>
-    <div class="stages-grid" id="stagesGrid"></div>
+    <div class="stage-list" id="stagesGrid"></div>
 
     <div class="dashboard-wrap">
       <div class="dashboard-head">
@@ -656,6 +821,25 @@ body{background:var(--bg-main);color:var(--text);display:flex;min-height:100vh;-
   </div>
 </div>
 
+<div id="pushOverlay" role="dialog" aria-modal="true" aria-labelledby="pmTitle1">
+  <div class="pm-box">
+    <div class="pm-steps"><span class="pm-step on" id="pmS1"><i>۱</i>بررسی</span><span class="pm-line"></span><span class="pm-step" id="pmS2"><i>۲</i>تأیید نهایی</span></div>
+    <div id="pmBody1">
+      <h3 id="pmTitle1">☁️ ارسال داده‌ها به سرور</h3>
+      <p class="pm-warn">⚠️ این کار داده‌های روی سرور را با نسخهٔ فعلی همین مرورگر <b>جایگزین</b> می‌کند و برای همهٔ کاربران اعمال می‌شود.</p>
+      <div class="pm-stats" id="pmStats"></div>
+      <div class="pm-note" id="pmNote"></div>
+      <div class="pm-actions"><button class="pm-btn ghost" id="pmCancel1" type="button">انصراف</button><button class="pm-btn primary" id="pmNext" type="button">ادامه ←</button></div>
+    </div>
+    <div id="pmBody2" style="display:none">
+      <h3>تأیید نهایی</h3>
+      <p>برای جلوگیری از ارسال اشتباهی، کلمهٔ <b>ارسال</b> را در کادر زیر تایپ کنید.</p>
+      <input id="pmInput" autocomplete="off" placeholder="ارسال" aria-label="کلمهٔ تأیید">
+      <div class="pm-actions"><button class="pm-btn ghost" id="pmBack" type="button">→ بازگشت</button><button class="pm-btn danger" id="pmGo" type="button" disabled>☁️ ارسال نهایی</button></div>
+    </div>
+  </div>
+</div>
+
 <div id="confirmAllOverlay">
   <div id="confirmAllBox">
     <h3>✅ تکمیل همه مراحل</h3>
@@ -801,20 +985,25 @@ function isCashed(inv){
 function computeCumulativeForStation(st){
   if(!st||!st.invoices)return;
   const keys=Object.keys(st.invoices);
-  const normals=keys
-    .map(k=>({k,inv:st.invoices[k],num:invNumericValue(k)}))
-    .filter(x=>invTypeOf(x.k,x.inv)==='normal')
-    .sort((a,b)=>{
-      if(a.num==null&&b.num==null)return String(a.k).localeCompare(String(b.k));
-      if(a.num==null)return 1;
-      if(b.num==null)return -1;
-      return a.num-b.num;
+  const sorter=(a,b)=>{
+    if(a.num==null&&b.num==null)return String(a.k).localeCompare(String(b.k));
+    if(a.num==null)return 1;
+    if(b.num==null)return -1;
+    return a.num-b.num;
+  };
+  /* تجمعی صورت‌وضعیت‌ها و تجمعی تعدیل‌ها دو سری جداگانه‌اند */
+  ['normal','adjustment'].forEach(type=>{
+    const list=keys
+      .map(k=>({k,inv:st.invoices[k],num:invNumericValue(k)}))
+      .filter(x=>invTypeOf(x.k,x.inv)===type)
+      .sort(sorter);
+    let running=0;
+    list.forEach(({inv})=>{
+      const raw=type==='adjustment'?inv.adjAmount:inv.netAmount;
+      const amt=(raw!=null&&raw!=='')?+raw:0;
+      if(inv.cumManual){running=inv.cumAmount!=null?+inv.cumAmount:running;}
+      else{running=running+(isNaN(amt)?0:amt);inv.cumAmount=running;inv.cumAuto=true;}
     });
-  let running=0;
-  normals.forEach(({inv})=>{
-    const net=inv.netAmount!=null?+inv.netAmount:0;
-    if(inv.cumManual){running=inv.cumAmount!=null?+inv.cumAmount:running;}
-    else{running=running+net;inv.cumAmount=running;inv.cumAuto=true;}
   });
 }
 function computeAllCumulative(){
@@ -1077,6 +1266,7 @@ function renderAll(){
   computeAllCumulative();
   renderSidebar();renderTopbar();renderInfoStrip();renderSummary();renderSummaryTable();
   renderStages();renderGantt();renderDonut();renderTitles();save();refreshUndoBtn();
+  if(typeof updateSyncChip==='function')updateSyncChip();
 }
 function renderSidebar(){
   const el=document.getElementById('stationList');el.innerHTML='';
@@ -1141,7 +1331,7 @@ function renderInfoStrip(){
     html+=`<div class="info-cell"><div class="lbl">مبلغ خالص دوره (ریال)</div><div class="val">${net}</div></div>`;
   }
   const cumTag=inv.cumAuto?'<span class="auto-tag" style="display:inline-block;background:oklch(93% 0.06 155);color:oklch(42% 0.12 155);border-radius:8px;font-size:.62rem;padding:1px 5px;margin-inline-start:4px;font-weight:700">خودکار</span>':'';
-  html+=`<div class="info-cell"><div class="lbl">مبلغ تجمعی (ریال)${cumTag}</div><div class="val">${cum}</div></div>`;
+  html+=`<div class="info-cell"><div class="lbl">${type==='adjustment'?'مبلغ تجمعی تعدیل‌ها (ریال)':'مبلغ تجمعی (ریال)'}${cumTag}</div><div class="val">${cum}</div></div>`;
   if(inv.contractorAmount!=null&&inv.contractorAmount!=='')html+=`<div class="info-cell contractor"><div class="lbl">اعلامی پیمانکار (ریال)</div><div class="val">${ctr}</div></div>`;
   if(inv.consultantAmount!=null&&inv.consultantAmount!=='')html+=`<div class="info-cell consultant"><div class="lbl">تاییدی مشاور (ریال)</div><div class="val">${cst}</div></div>`;
   if(inv.employerAmount!=null&&inv.employerAmount!=='')html+=`<div class="info-cell employer"><div class="lbl">تاییدی کارفرما (ریال)</div><div class="val">${emp}</div></div>`;
@@ -1216,39 +1406,129 @@ function renderSummaryTable(){
     localStorage.setItem(SUMMARY_COLLAPSE_KEY,isCollapsed?'1':'0');
   };
 }
-function renderStages(){
-  const _curInvObj=curInvoice();
-  const _sTitle=document.getElementById('stagesSectionTitle');
-  if(_sTitle)_sTitle.textContent=(_curInvObj&&_curInvObj.type==='adjustment')?'مراحل تعدیل':'مراحل صورت وضعیت';
-  const inv=curInvoice(),el=document.getElementById('stagesGrid');el.innerHTML='';
-  if(!inv){el.innerHTML='<p style="color:var(--muted)">برای این ایستگاه هنوز شماره صورت وضعیتی ثبت نشده است.</p>';return;}
-  inv.stages.forEach((st,i)=>{
-    const hx=st.color||stageHex(i);
-    const card=document.createElement('div');card.className='stage-card'+(inv.type==='adjustment'?' adj-card':'');
-    card.style.background=hx+'1f';
-    card.innerHTML=`
-      <div class="strip" style="background:${hx}"></div>
-      <div class="body">
-        <h3><span class="stage-num" style="background:${hx}">${i+1}</span>${esc(st.name)}${inv.type==='adjustment'?'<span class="adj-badge">تعدیل</span>':''}</h3>
-        <div class="stage-meta">
-          <span>👤 مسئول: <b>${esc(st.resp)||'—'}</b></span>
-          <span>📅 شروع: <b>${jalaliFmt(st.start)}</b> &nbsp;|&nbsp; پایان: <b>${jalaliFmt(st.end)}</b></span>
-        </div>
-        <div class="progress-row">
-          <div class="pbar"><div class="pfill" style="width:${st.progress}%;background:${hx}"></div></div>
-          <span class="pct">٪${st.progress}</span>
-        </div>
-        <span class="badge ${STATUS_CLASS[st.status]}">${STATUSES[st.status]}</span>
-        ${st.notes?`<div class="stage-notes">${esc(st.notes)}</div>`:''}
-      </div>
-      <div class="card-actions">
-        <button onclick="openStageModal(${i})">✏️ ویرایش</button>
-        <button onclick="moveStage(${i},-1)">⬆ بالا</button>
-        <button onclick="moveStage(${i},1)">⬇ پایین</button>
-        <button class="del" onclick="deleteStage(${i})">🗑 حذف</button>
-      </div>`;
-    el.appendChild(card);
+/* ===== مراحل — نمای تایم‌لاین فشرده ===== */
+let STAGE_FILTER='all';
+const STAGE_OPEN=new Set();
+let __stageInvKey=null,__dragUndo=false,__stageBound=false;
+function roleIsViewer(){try{const x=JSON.parse(sessionStorage.getItem('meco_auth_session_v1')||'null');return !!x&&x.role==='viewer';}catch(e){return false;}}
+function applyProgress(st,v){
+  const p=Math.max(0,Math.min(100,Math.round(+v||0)));
+  st.progress=p;
+  if(p>=100)st.status='done';
+  else if(p===0){if(st.status!=='hold')st.status='none';}
+  else if(st.status==='none'||st.status==='done')st.status='doing';
+}
+function setStageProgress(i,v){
+  if(roleIsViewer())return;
+  const inv=curInvoice();if(!inv||!inv.stages[i])return;
+  pushUndo();applyProgress(inv.stages[i],v);renderAll();
+}
+function setStageStatus(i,v){
+  if(roleIsViewer())return;
+  const inv=curInvoice();if(!inv||!inv.stages[i]||!STATUSES[v])return;
+  pushUndo();
+  const st=inv.stages[i];st.status=v;
+  if(v==='done')st.progress=100;
+  else if(v==='none')st.progress=0;
+  else if(v==='doing'&&st.progress>=100)st.progress=90;
+  renderAll();
+}
+function toggleStageRow(i){
+  const row=document.querySelector('#stagesGrid .srow[data-i="'+i+'"]');if(!row)return;
+  const open=row.classList.toggle('open');
+  if(open)STAGE_OPEN.add(i);else STAGE_OPEN.delete(i);
+}
+function stageGroup(st){return st.status==='done'?'done':(st.status==='doing'?'doing':'none');}
+function bindStageEvents(){
+  if(__stageBound)return;__stageBound=true;
+  const el=document.getElementById('stagesGrid');
+  el.addEventListener('click',e=>{
+    const chip=e.target.closest('.qchip');
+    if(chip){e.stopPropagation();setStageProgress(+chip.closest('.srow').dataset.i,+chip.dataset.v);return;}
+    if(e.target.closest('.sbody'))return;
+    const head=e.target.closest('.shead');
+    if(head)toggleStageRow(+head.closest('.srow').dataset.i);
   });
+  el.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('shead')){e.preventDefault();toggleStageRow(+e.target.closest('.srow').dataset.i);}
+  });
+  el.addEventListener('input',e=>{
+    const r=e.target.closest('.srange');if(!r||roleIsViewer())return;
+    const row=r.closest('.srow'),i=+row.dataset.i,inv=curInvoice();if(!inv||!inv.stages[i])return;
+    if(!__dragUndo){pushUndo();__dragUndo=true;}
+    const st=inv.stages[i];applyProgress(st,r.value);
+    row.querySelector('.pfill').style.width=st.progress+'%';
+    row.querySelector('.pct').textContent='٪'+st.progress;
+    const b=row.querySelector('.badge');b.textContent=STATUSES[st.status];b.className='badge '+STATUS_CLASS[st.status];
+  });
+  el.addEventListener('change',e=>{
+    if(e.target.classList.contains('srange')){__dragUndo=false;renderAll();return;}
+    if(e.target.classList.contains('sstatus'))setStageStatus(+e.target.closest('.srow').dataset.i,e.target.value);
+  });
+}
+function renderStages(){
+  const inv=curInvoice(),el=document.getElementById('stagesGrid');
+  const ttl=document.getElementById('stagesSectionTitle');
+  if(ttl)ttl.textContent=(inv&&inv.type==='adjustment')?'مراحل تعدیل':'مراحل صورت وضعیت';
+  bindStageEvents();
+  const key=cur.st+'|'+cur.inv;
+  if(key!==__stageInvKey){STAGE_OPEN.clear();STAGE_FILTER='all';__stageInvKey=key;}
+  const cnt=document.getElementById('stagesCount'),flt=document.getElementById('stageFilter');
+  if(!inv){
+    el.className='stage-list';
+    el.innerHTML='<div class="stage-empty">برای این ایستگاه هنوز شماره صورت وضعیتی ثبت نشده است.</div>';
+    if(cnt)cnt.innerHTML='';if(flt)flt.innerHTML='';return;
+  }
+  const stages=inv.stages||[];
+  const n=stages.length,nDone=stages.filter(s=>s.status==='done').length;
+  const nDoing=stages.filter(s=>s.status==='doing').length;
+  const avg=n?Math.round(stages.reduce((a,s)=>a+(+s.progress||0),0)/n):0;
+  if(cnt)cnt.innerHTML=`<span>${nDone} از ${n} مرحله انجام شده</span><span class="mini"><i style="width:${avg}%"></i></span><b>٪${avg}</b>`;
+  const tabs=[['all','همه',n],['doing','در حال انجام',nDoing],['done','انجام شده',nDone],['none','انجام نشده',n-nDone-nDoing]];
+  if(flt)flt.innerHTML=tabs.map(t=>`<button type="button" class="${STAGE_FILTER===t[0]?'on':''}" data-f="${t[0]}">${t[1]} (${t[2]})</button>`).join('');
+  if(flt)Array.prototype.forEach.call(flt.querySelectorAll('button'),b=>{b.onclick=()=>{STAGE_FILTER=b.dataset.f;renderStages();};});
+  const curIdx=stages.findIndex(s=>s.status!=='done');
+  el.className='stage-list'+(inv.type==='adjustment'?' adj':'');
+  let html='';
+  stages.forEach((st,i)=>{
+    if(STAGE_FILTER!=='all'&&stageGroup(st)!==STAGE_FILTER)return;
+    const p=Math.max(0,Math.min(100,+st.progress||0));
+    const done=st.status==='done',isCur=i===curIdx;
+    const hx=done?'#16a34a':(st.color||stageHex(i));
+    const dates=(st.start||st.end)?`<span>📅 <b>${jalaliFmt(st.start)}</b> ← <b>${jalaliFmt(st.end)}</b></span>`:'';
+    const resp=st.resp?`<span>👤 <b>${esc(st.resp)}</b></span>`:'';
+    const note=st.notes?`<span title="${esc(st.notes)}">📝 توضیحات</span>`:'';
+    html+=`
+    <div class="srow${done?' done':''}${isCur?' current':''}${STAGE_OPEN.has(i)?' open':''}" data-i="${i}" style="--c:${hx}">
+      <div class="srail"><span class="snum">${done?'✓':i+1}</span></div>
+      <div class="scard">
+        <div class="shead" role="button" tabindex="0" aria-expanded="${STAGE_OPEN.has(i)}">
+          <div class="stext">
+            <div class="sname">${esc(st.name)}${isCur?'<span class="cur-tag">مرحلهٔ جاری</span>':''}</div>
+            ${(resp||dates||note)?`<div class="smeta">${resp}${dates}${note}</div>`:''}
+          </div>
+          <div class="sprog"><div class="pbar"><div class="pfill" style="width:${p}%;background:${hx}"></div></div><span class="pct">٪${p}</span></div>
+          <span class="badge ${STATUS_CLASS[st.status]||'st-none'}">${STATUSES[st.status]||''}</span>
+          <span class="chev">▾</span>
+        </div>
+        <div class="sbody">
+          <div class="sctrl stage-edit-only">
+            <div class="qchips">${[0,25,50,75,100].map(v=>`<button type="button" class="qchip${p===v?' on':''}" data-v="${v}">${v}٪</button>`).join('')}</div>
+            <input class="srange" type="range" min="0" max="100" step="5" value="${p}" aria-label="درصد پیشرفت">
+            <select class="sstatus" aria-label="وضعیت">${Object.entries(STATUSES).map(([k,v])=>`<option value="${k}"${st.status===k?' selected':''}>${v}</option>`).join('')}</select>
+          </div>
+          ${st.notes?`<div class="snotes">${esc(st.notes)}</div>`:''}
+          <div class="sactions stage-edit-only">
+            <button type="button" onclick="openStageModal(${i})">✏️ ویرایش کامل</button>
+            <button type="button" onclick="moveStage(${i},-1)">⬆ بالا</button>
+            <button type="button" onclick="moveStage(${i},1)">⬇ پایین</button>
+            <button type="button" class="del" onclick="deleteStage(${i})">🗑 حذف</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html||'<div class="stage-empty">مرحله‌ای با این فیلتر وجود ندارد.</div>';
 }
 
 function renderGantt(){
@@ -1458,8 +1738,8 @@ function saveStage(idx){
   if(idx!=null)inv.stages[idx]=obj;else inv.stages.push(obj);
   closeModal();renderAll();
 }
-function deleteStage(i){const inv=curInvoice();if(inv&&confirm('این مرحله حذف شود؟')){pushUndo();inv.stages.splice(i,1);renderAll();}}
-function moveStage(i,d){const inv=curInvoice();if(!inv)return;const j=i+d;if(j<0||j>=inv.stages.length)return;pushUndo();[inv.stages[i],inv.stages[j]]=[inv.stages[j],inv.stages[i]];renderAll();}
+function deleteStage(i){const inv=curInvoice();if(inv&&confirm('این مرحله حذف شود؟')){pushUndo();inv.stages.splice(i,1);STAGE_OPEN.clear();renderAll();}}
+function moveStage(i,d){const inv=curInvoice();if(!inv)return;const j=i+d;if(j<0||j>=inv.stages.length)return;pushUndo();[inv.stages[i],inv.stages[j]]=[inv.stages[j],inv.stages[i]];{const a=STAGE_OPEN.has(i),b=STAGE_OPEN.has(j);STAGE_OPEN.delete(i);STAGE_OPEN.delete(j);if(a)STAGE_OPEN.add(j);if(b)STAGE_OPEN.add(i);}renderAll();}
 
 function openConfirmAll(){
   const inv=curInvoice();if(!inv){alert('ابتدا یک صورت وضعیت انتخاب کنید.');return;}
@@ -1527,19 +1807,22 @@ function refreshCumHint(){
   if(ADD_INV_MODE==='edit'){el.textContent='اگر خالی بماند، به‌صورت خودکار محاسبه می‌شود.';return;}
   if(!name){el.textContent='';return;}
   const s=curStation();
+  const adj=isAdjType();
+  const targetType=adj?'adjustment':'normal';
   const targetNum=+String(name).replace(/[^\d.-]/g,'');
-  const netInput=parseMoney(document.getElementById('addInvNet').value);
-  if(s&&!isNaN(targetNum)&&netInput!=null){
+  const amtInput=parseMoney(document.getElementById(adj?'addInvAdjAmt':'addInvNet').value);
+  if(s&&!isNaN(targetNum)&&amtInput!=null){
     let running=0;
-    const normals=Object.keys(s.invoices)
+    const prev=Object.keys(s.invoices)
       .map(k=>({k,inv:s.invoices[k],num:invNumericValue(k)}))
-      .filter(x=>invTypeOf(x.k,x.inv)==='normal'&&x.num!=null&&x.num<targetNum)
+      .filter(x=>invTypeOf(x.k,x.inv)===targetType&&x.num!=null&&x.num<targetNum)
       .sort((a,b)=>a.num-b.num);
-    normals.forEach(({inv})=>{
+    prev.forEach(({inv})=>{
+      const raw=adj?inv.adjAmount:inv.netAmount;
       if(inv.cumManual){running=inv.cumAmount!=null?+inv.cumAmount:running;}
-      else{running=running+(inv.netAmount!=null?+inv.netAmount:0);}
+      else{running=running+(raw!=null&&raw!==''?+raw:0);}
     });
-    el.textContent='پیشنهاد خودکار: مبلغ تجمعی = '+fmtMoney(running+netInput)+' ریال';
+    el.textContent='پیشنهاد خودکار: مبلغ تجمعی '+(adj?'تعدیل‌ها':'')+' = '+fmtMoney(running+amtInput)+' ریال';
   }else{
     el.textContent='اگر خالی بماند، به‌صورت خودکار محاسبه می‌شود.';
   }
@@ -1655,6 +1938,7 @@ function confirmAddInv(){
 }
 document.getElementById('addInvName').addEventListener('input',refreshCumHint);
 document.getElementById('addInvNet').addEventListener('input',refreshCumHint);
+document.getElementById('addInvAdjAmt').addEventListener('input',refreshCumHint);
 ['addInvNet','addInvAdjAmt','addInvCum','addInvContractor','addInvConsultant','addInvEmployer'].forEach(id=>{
   const el=document.getElementById(id);if(!el)return;
   el.addEventListener('blur',()=>{const n=parseMoney(el.value);if(n!=null)el.value=n.toLocaleString('en-US');});
@@ -1789,7 +2073,7 @@ function buildReportRows(stationFilter,typeFilter,opts){
       return true;
     });
     if(!filtered.length)return;
-    let sumNet=0,sumAdj=0,lastCumInStation=null;
+    let sumNet=0,sumAdj=0,lastCumInStation=null;const lastCumByType={normal:null,adjustment:null};
     let sumOverhead=0,sumVat=0,sumFinal=0;
     let sumContractor=0,sumConsultant=0,sumEmployer=0;
     filtered.forEach(k=>{
@@ -1819,7 +2103,7 @@ function buildReportRows(stationFilter,typeFilter,opts){
       });
       if(inv.netAmount!=null)sumNet+=+inv.netAmount;
       if(inv.adjAmount!=null)sumAdj+=+inv.adjAmount;
-      if(inv.cumAmount!=null)lastCumInStation=+inv.cumAmount;
+      if(inv.cumAmount!=null){lastCumByType[t==='adjustment'?'adjustment':'normal']=+inv.cumAmount;}
       sumOverhead+=overheadAmt;
       sumVat+=vatAmt;
       sumFinal+=finalAmt;
@@ -1827,6 +2111,7 @@ function buildReportRows(stationFilter,typeFilter,opts){
       if(inv.consultantAmount!=null)sumConsultant+=+inv.consultantAmount;
       if(inv.employerAmount!=null)sumEmployer+=+inv.employerAmount;
     });
+    lastCumInStation=(lastCumByType.normal!=null||lastCumByType.adjustment!=null)?((lastCumByType.normal||0)+(lastCumByType.adjustment||0)):null;
     rows.push({subtotal:true,station:st.name,label:'جمع ایستگاه: '+st.name,
       net:fmtMoney(sumNet),adj:fmtMoney(sumAdj),cum:(lastCumInStation!=null?fmtMoney(lastCumInStation):'—'),
       netRaw:sumNet,adjRaw:sumAdj,cumRaw:lastCumInStation,
@@ -1838,7 +2123,7 @@ function buildReportRows(stationFilter,typeFilter,opts){
     totalNet+=sumNet;totalAdj+=sumAdj;
     totalOverhead+=sumOverhead;totalVat+=sumVat;totalFinal+=sumFinal;
     totalContractor+=sumContractor;totalConsultant+=sumConsultant;totalEmployer+=sumEmployer;
-    if(lastCumInStation!=null)lastCum=lastCumInStation;
+    if(lastCumInStation!=null)lastCum+=lastCumInStation;
   });
   return {rows,totalNet,totalAdj,totalCum:lastCum,stations,
     totalOverhead,totalVat,totalFinal,totalContractor,totalConsultant,totalEmployer,
@@ -2697,64 +2982,177 @@ function getAuthHeader(){
   if(!session||!session.u||!session.p)return null;
   return "Basic "+btoa(unescape(encodeURIComponent(session.u+":"+session.p)));
 }
-function setSyncStatus(msg){const el=document.getElementById("syncStatus");if(el)el.textContent=msg;console.log("[sync]",msg);}
+/* ===== وضعیت همگام‌سازی ===== */
+let SYNC_STATE='idle',SYNC_MSG='',__syncBusy=false;
+function dbFingerprint(){
+  try{
+    if(!DB)return '';
+    const str=JSON.stringify({stations:DB.stations,consultants:DB.consultants});
+    let h=5381;for(let i=0;i<str.length;i++){h=((h<<5)+h+str.charCodeAt(i))|0;}
+    return str.length+':'+h;
+  }catch(e){return '';}
+}
+function syncedFp(){return localStorage.getItem('meco_synced_fp')||'';}
+function markSynced(){try{localStorage.setItem('meco_synced_fp',dbFingerprint());localStorage.setItem('meco_synced_at',String(Date.now()));}catch(e){}}
+function hasUnsyncedChanges(){const f=syncedFp();return !!f&&dbFingerprint()!==f;}
+function localHasData(){return !!(DB&&DB.stations&&DB.stations.some(s=>s.invoices&&Object.keys(s.invoices).length));}
+function fmtClock(ts){try{return new Date(+ts).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function toast(msg,type){
+  let box=document.getElementById('toastBox');
+  if(!box){box=document.createElement('div');box.id='toastBox';document.body.appendChild(box);}
+  const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;box.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),320);},3800);
+}
+function setSyncStatus(msg,state){SYNC_MSG=msg||'';SYNC_STATE=state||'idle';console.log('[sync]',msg);updateSyncChip();}
+function updateSyncChip(){
+  const chip=document.getElementById('syncChip'),el=document.getElementById('syncStatus');if(!chip||!el)return;
+  let state=SYNC_STATE,text=SYNC_MSG;
+  if(state!=='busy'&&state!=='err'){
+    const at=localStorage.getItem('meco_synced_at');
+    if(!syncedFp()){state='idle';text='همگام‌سازی نشده';}
+    else if(hasUnsyncedChanges()&&!roleIsViewer()){state='dirty';text='تغییرات ارسال‌نشده'+(at?' · آخرین همگام‌سازی '+fmtClock(at):'');}
+    else{state='ok';text='همگام با سرور'+(at?' · '+fmtClock(at):'');}
+  }
+  chip.className='sync-chip '+state;el.textContent=text;chip.title=SYNC_MSG||text;
+}
 async function hashPw(password){
   const msgBuffer=new TextEncoder().encode(password);
   const hashBuffer=await crypto.subtle.digest("SHA-256",msgBuffer);
   const hashArray=Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b=>b.toString(16).padStart(2,"0")).join("");
 }
-async function gistPull(){
+async function gistPull(opts){
+  const auto=!!(opts&&opts.auto===true);
   const auth=getAuthHeader();
-  if(!auth){alert("لطفاً ابتدا وارد حساب کاربری خود شوید.");return;}
-  setSyncStatus("در حال دریافت داده‌ها از سرور...");
+  if(!auth){if(!auto)alert("لطفاً ابتدا وارد حساب کاربری خود شوید.");return false;}
+  if(__syncBusy)return false;
+  __syncBusy=true;
+  setSyncStatus(auto?"در حال به‌روزرسانی خودکار داده‌ها…":"در حال دریافت داده‌ها از سرور…",'busy');
   try{
     const res=await fetch(`${WORKER_URL}/pull`,{method:"GET",headers:{"Authorization":auth}});
     if(res.status===401)throw new Error("دسترسی غیرمجاز. مجدداً لاگین کنید.");
     if(!res.ok)throw new Error(`خطای سرور: ${res.status}`);
     const remoteData=await res.json();
     const remoteDb=remoteData&&(remoteData.db||remoteData);
-    if(remoteDb&&remoteDb.stations){
-      pushUndo();
-      let imported;
-      if(Array.isArray(remoteDb.stations)&&remoteDb.stations.length&&Array.isArray(remoteDb.stations[0].invoices)){
-        imported=importDbFromBackup(remoteDb);
-      }else{
-        imported=remoteDb;
-        imported.stations.forEach(st=>migrateOldInvoices(st));
-      }
-      DB=imported;
-      if(!DB.consultants||!DB.consultants.length)DB.consultants=JSON.parse(JSON.stringify(DEFAULT_CONSULTANTS));
-      DB.stations.forEach(st=>migrateRoofStage(st));
-      DB.stations.forEach(st=>migrateCashStage(st));
-      computeAllCumulative();
-      localStorage.setItem("mokho_db",JSON.stringify(DB));
-      renderAll();
-      let _pullCount=parseInt(localStorage.getItem("meco_pull_count")||"0",10)+1;
-      const _now=new Date();
-      const _pullDate=_now.toLocaleDateString("fa-IR",{year:"numeric",month:"long",day:"numeric"})+" ساعت "+String(_now.getHours()).padStart(2,"0")+":"+String(_now.getMinutes()).padStart(2,"0");
-      localStorage.setItem("meco_pull_count",String(_pullCount));
-      localStorage.setItem("meco_pull_last",_pullDate);
-      setSyncStatus("✅ Pull موفق — نسخه "+_pullCount+" از وب دریافت شد — "+_pullDate);
+    if(!(remoteDb&&remoteDb.stations)){
+      setSyncStatus("روی سرور هنوز داده‌ای ذخیره نشده است",'idle');
+      return false;
     }
-  }catch(err){setSyncStatus("❌ خطا در Pull: "+err.message);alert("خطا در همگام‌سازی: "+err.message);}
+    /* محافظت از تغییرات محلیِ Push‌نشده */
+    const fp=syncedFp();
+    const localDirty=localHasData()&&(fp?dbFingerprint()!==fp:true);
+    if(auto&&localDirty&&!roleIsViewer()){
+      const ok=confirm("روی این مرورگر تغییراتی دارید که هنوز Push نشده‌اند.\n\nOK = جایگزینی با نسخهٔ سرور (یک نسخهٔ پشتیبان محلی نگه داشته می‌شود و با «بازگردانی» هم قابل برگشت است)\nCancel = ماندن روی داده‌های محلی");
+      if(!ok){setSyncStatus("به‌روزرسانی انجام نشد — داده‌های محلی حفظ شد",'err');return false;}
+    }
+    if(localDirty){try{localStorage.setItem("meco_local_backup_before_pull",JSON.stringify({ts:Date.now(),db:DB}));}catch(e){}}
+    const prevName=(curStation()||{}).name,prevInv=cur.inv;
+    pushUndo();
+    let imported;
+    if(Array.isArray(remoteDb.stations)&&remoteDb.stations.length&&Array.isArray(remoteDb.stations[0].invoices)){
+      imported=importDbFromBackup(remoteDb);
+    }else{
+      imported=remoteDb;
+      imported.stations.forEach(st=>migrateOldInvoices(st));
+    }
+    DB=imported;
+    if(!DB.consultants||!DB.consultants.length)DB.consultants=JSON.parse(JSON.stringify(DEFAULT_CONSULTANTS));
+    DB.stations.forEach(st=>migrateRoofStage(st));
+    DB.stations.forEach(st=>migrateCashStage(st));
+    computeAllCumulative();
+    /* حفظ ایستگاه و آیتم انتخاب‌شده */
+    const ns=DB.stations.find(s=>s.id===cur.st)||DB.stations.find(s=>s.name===prevName)||DB.stations[0]||null;
+    cur.st=ns?ns.id:null;
+    if(ns){
+      if(prevInv&&ns.invoices[prevInv]!==undefined)cur.inv=prevInv;
+      else{const ks=Object.keys(ns.invoices).sort((a,b)=>(+parseKey(a).num)-(+parseKey(b).num));cur.inv=ks.length?ks[0]:null;}
+    }else cur.inv=null;
+    localStorage.setItem("mokho_db",JSON.stringify(DB));
+    markSynced();
+    renderAll();
+    const _pullCount=parseInt(localStorage.getItem("meco_pull_count")||"0",10)+1;
+    const _now=new Date();
+    const _pullDate=_now.toLocaleDateString("fa-IR",{year:"numeric",month:"long",day:"numeric"})+" ساعت "+String(_now.getHours()).padStart(2,"0")+":"+String(_now.getMinutes()).padStart(2,"0");
+    localStorage.setItem("meco_pull_count",String(_pullCount));
+    localStorage.setItem("meco_pull_last",_pullDate);
+    setSyncStatus("آخرین دریافت: "+_pullDate,'ok');
+    toast(auto?"✅ داده‌ها به‌صورت خودکار از سرور به‌روز شد":"✅ داده‌ها از سرور دریافت شد",'ok');
+    return true;
+  }catch(err){
+    setSyncStatus((auto?"خطا در به‌روزرسانی خودکار: ":"خطا در Pull: ")+err.message,'err');
+    if(auto)toast("⚠️ به‌روزرسانی خودکار انجام نشد؛ از داده‌های محلی استفاده می‌شود",'err');
+    else alert("خطا در همگام‌سازی: "+err.message);
+    return false;
+  }finally{__syncBusy=false;}
 }
-async function gistPush(){
+
+/* ===== Push با تأیید دو مرحله‌ای ===== */
+function pmEl(id){return document.getElementById(id);}
+function closePushConfirm(){pmEl('pushOverlay').classList.remove('show');pmEl('pmInput').value='';}
+function pmWordOk(v){v=(v||'').trim().toLowerCase();return v==='ارسال'||v==='push';}
+function pmShowStep(n){
+  pmEl('pmBody1').style.display=n===1?'':'none';
+  pmEl('pmBody2').style.display=n===2?'':'none';
+  pmEl('pmS1').className='pm-step '+(n===1?'on':'done');
+  pmEl('pmS2').className='pm-step '+(n===2?'on':'');
+  if(n===1)pmEl('pmCancel1').focus();
+  else{const i=pmEl('pmInput');i.value='';i.className='';pmEl('pmGo').disabled=true;setTimeout(()=>i.focus(),30);}
+}
+function openPushConfirm(){
+  let nSt=0,nInv=0,nAdj=0;
+  (DB.stations||[]).forEach(st=>{nSt++;Object.keys(st.invoices||{}).forEach(k=>{nInv++;if(invTypeOf(k,st.invoices[k])==='adjustment')nAdj++;});});
+  pmEl('pmStats').innerHTML=`<div><b>${nSt}</b><span>ایستگاه</span></div><div><b>${nInv-nAdj}</b><span>صورت وضعیت</span></div><div><b>${nAdj}</b><span>تعدیل</span></div>`;
+  const note=pmEl('pmNote');
+  if(!syncedFp()){note.className='pm-note bad';note.textContent='⚠️ هنوز هیچ دریافتی از سرور روی این مرورگر ثبت نشده؛ ممکن است داده‌های جدیدتر سرور بازنویسی شوند.';}
+  else if(hasUnsyncedChanges()){note.className='pm-note';note.textContent='تغییرات ارسال‌نشده دارید.';}
+  else{note.className='pm-note';note.textContent='نسبت به آخرین همگام‌سازی تغییری ندارید.';}
+  pmShowStep(1);
+  pmEl('pushOverlay').classList.add('show');
+}
+(function wirePush(){
+  pmEl('pmCancel1').onclick=closePushConfirm;
+  pmEl('pmNext').onclick=()=>pmShowStep(2);
+  pmEl('pmBack').onclick=()=>pmShowStep(1);
+  pmEl('pmInput').addEventListener('input',e=>{const ok=pmWordOk(e.target.value);e.target.className=ok?'ok':'';pmEl('pmGo').disabled=!ok;});
+  pmEl('pmInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&pmWordOk(e.target.value)){e.preventDefault();pmEl('pmGo').click();}});
+  pmEl('pmGo').onclick=()=>{if(!pmWordOk(pmEl('pmInput').value))return;closePushConfirm();gistPushExec();};
+  pmEl('pushOverlay').addEventListener('click',e=>{if(e.target.id==='pushOverlay')closePushConfirm();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pmEl('pushOverlay').classList.contains('show'))closePushConfirm();});
+})();
+function gistPush(){
   const session=JSON.parse(sessionStorage.getItem("meco_auth_session_v1")||"null");
   if(!session||session.role!=="admin"){alert("⛔ عملیات Push فقط برای نقش مدیر (Admin) مجاز است.");return;}
+  openPushConfirm();
+}
+async function gistPushExec(){
+  const session=JSON.parse(sessionStorage.getItem("meco_auth_session_v1")||"null");
+  if(!session||session.role!=="admin"){alert("⛔ عملیات Push فقط برای نقش مدیر (Admin) مجاز است.");return;}
+  if(__syncBusy)return;
+  __syncBusy=true;
   const auth=getAuthHeader();
-  setSyncStatus("در حال ارسال داده‌ها به سرور...");
+  setSyncStatus("در حال ارسال داده‌ها به سرور…",'busy');
   try{
     const exportPayload=exportDbForBackup();
     const payload=JSON.stringify({db:exportPayload,lastModified:new Date().toISOString(),updatedBy:session.u});
     const res=await fetch(`${WORKER_URL}/push`,{method:"POST",headers:{"Authorization":auth,"Content-Type":"application/json"},body:payload});
     if(res.status===401||res.status===403)throw new Error("عدم دسترسی به عملیات Push");
     if(!res.ok)throw new Error(`خطای سرور: ${res.status}`);
-    setSyncStatus("✅ تغییرات با موفقیت در فضای ابری ذخیره شد.");
-  }catch(err){setSyncStatus("❌ خطا در Push: "+err.message);alert("خطا در ذخیره‌سازی: "+err.message);}
+    markSynced();
+    setSyncStatus("تغییرات با موفقیت در فضای ابری ذخیره شد",'ok');
+    toast("✅ داده‌ها با موفقیت به سرور ارسال شد",'ok');
+  }catch(err){setSyncStatus("خطا در Push: "+err.message,'err');alert("خطا در ذخیره‌سازی: "+err.message);}
+  finally{__syncBusy=false;}
 }
 
-window.__mecoInit=function(){load();renderAll();refreshUndoBtn();};
+/* ===== منوهای کشویی نوار ابزار ===== */
+document.addEventListener('click',function(e){
+  const tg=e.target.closest&&e.target.closest('.dd-toggle');
+  document.querySelectorAll('.dd.open').forEach(d=>{if(!tg||d!==tg.closest('.dd'))d.classList.remove('open');});
+  if(tg)tg.closest('.dd').classList.toggle('open');
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));});
+
+window.__mecoInit=function(){load();renderAll();refreshUndoBtn();gistPull({auto:true});};
 /* fallback سراسری — اگر AUTH هنوز لود نشده باشد */
 if(typeof window.isViewer!=='function'){
   window.isViewer=function(){
@@ -2829,10 +3227,13 @@ function playLogoutScene(andShowLogin){
 #mtAuthBox .mtbtn:hover{filter:brightness(1.08)}
 #mtAuthMsg{font-size:.8rem;margin-top:10px;min-height:1.2em;text-align:center}
 #mtAuthMsg.err{color:#dc2626}#mtAuthMsg.ok{color:#16a34a}
-#mtUserBar{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
-#mtUserBar b{color:var(--accent-dark)}
-#mtUserBar button{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-family:inherit;font-size:.78rem;color:var(--text)}
-#mtUserBar button:hover{background:var(--bg-main)}
+#mtUserBar{display:flex;align-items:center;font-size:.78rem;color:var(--muted)}
+#mtUserBar .user-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:999px;padding:3px 12px 3px 4px;cursor:pointer;font-family:inherit;color:var(--text);transition:.15s}
+#mtUserBar .user-chip:hover{border-color:var(--accent)}
+#mtUserBar .avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-dark);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem}
+#mtUserBar .uname{font-weight:700;font-size:.8rem}
+#mtUserBar .role{font-size:.64rem;font-weight:700;padding:1px 8px;border-radius:10px;background:oklch(93% 0.06 230);color:oklch(45% 0.13 230)}
+#mtUserBar .role.admin{background:oklch(93% 0.06 155);color:oklch(42% 0.12 155)}
 body.mt-viewer #addStationBtn,body.mt-viewer #editAddBtn,body.mt-viewer #addInvoiceBtn,
 body.mt-viewer #delInvoiceBtn,body.mt-viewer #toggleTypeBtn,body.mt-viewer #renameInvoiceBtn,
 body.mt-viewer #editMetaBtn,body.mt-viewer .btn-excel,body.mt-viewer .btn-excel-template,
@@ -3121,7 +3522,7 @@ document.addEventListener('submit',function(e){
 function addUserBar(){
   var bar=document.getElementById('mtUserBar');if(bar)return;
   bar=document.createElement('div');bar.id='mtUserBar';
-  var host=document.querySelector('#topbar .action-bar')||document.getElementById('topbar');
+  var host=document.getElementById('userSlot')||document.getElementById('topbar');
   host.appendChild(bar);
 }
 function renderUserBar(){
@@ -3129,10 +3530,10 @@ function renderUserBar(){
   var bar=document.getElementById('mtUserBar');
   if(!s){bar.innerHTML='';return;}
   var roleFa=s.role==='admin'?'مدیر':'نمایش‌دهنده';
-  var html='<span>کاربر: <b>'+s.u+'</b> | نقش: <b>'+(s.role==='admin'?'admin':'viewer')+'</b> ('+roleFa+')</span>';
-  if(s.role==='admin')html+='<button id="mtOpenUsers" title="مدیریت کاربران">👤 مدیریت کاربران</button>';
-  if(s.role==='admin')html+='<button class="btn-manage-tpl btn" id="mtManageTplBtn" style="padding:6px 12px;font-size:.78rem;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-family:inherit;color:var(--text);margin-inline-start:4px" onclick="openManageTpl()">⚙️ مدیریت قالب‌ها</button>';
-  html+='<button id="mtLogoutBtn">🚪 خروج</button>';
+  var init=esc(String(s.u||'?').trim().charAt(0).toUpperCase());
+  var html='<div class="dd end"><button type="button" class="user-chip dd-toggle" title="حساب کاربری"><span class="avatar">'+init+'</span><span class="uname">'+esc(s.u)+'</span><span class="role '+(s.role==='admin'?'admin':'')+'">'+roleFa+'</span><span class="car" style="font-size:.65rem;opacity:.6">▾</span></button><div class="dd-menu">';
+  if(s.role==='admin')html+='<button type="button" class="dd-item" id="mtOpenUsers"><span class="ic">👤</span>مدیریت کاربران</button><div class="dd-sep"></div>';
+  html+='<button type="button" class="dd-item danger" id="mtLogoutBtn"><span class="ic">🚪</span>خروج از حساب</button></div></div>';
   bar.innerHTML=html;
   var ou=document.getElementById('mtOpenUsers');
   if(ou)ou.onclick=function(){openUsers();};
@@ -3143,7 +3544,7 @@ function renderUserBar(){
     playLogoutScene(true);
   };
     var bmt=document.getElementById('btnManageTpl');
-  if(bmt)bmt.style.display=(s.role==='admin')?'inline-flex':'none';
+  if(bmt)bmt.style.display=(s.role==='admin')?'flex':'none';
 }
 function renderUserList(){
   var box=document.getElementById('mtUserList');
